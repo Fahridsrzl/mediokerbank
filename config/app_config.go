@@ -10,4 +10,10 @@ const (
 	AuthLogin        = "/login"
 	AuthRefreshToken = "/refresh-token"
 
+	StockGroup    = "/stocks"
+	StockCreate   = "/"
+	StockFindById = "/:id"
+	StockFindMany = "/"
+	StockUpdate   = "/:id"
+	StockDelete   = "/:id"
 )
