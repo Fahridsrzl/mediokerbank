@@ -1,9 +1,7 @@
 package main
 
-import (
-
-)
+import "medioker-bank/delivery"
 
 func main() {
-
+	delivery.NewServer().Run()
 }
