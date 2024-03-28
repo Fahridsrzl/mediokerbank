@@ -14,11 +14,12 @@ type ApiConfig struct {
 }
 
 type DbConfig struct {
-	Host   string
-	Port   string
-	Name   string
-	User   string
-	Driver string
+	Host     string
+	Port     string
+	Name     string
+	User     string
+	Password string
+	Driver   string
 }
 
 type LogFileConfig struct {
@@ -52,6 +53,7 @@ func (c *Config) readConfig() error {
 		Port:   os.Getenv("DB_PORT"),
 		Name:   os.Getenv("DB_NAME"),
 		User:   os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
 		Driver: os.Getenv("DB_DRIVER"),
 	}
 
@@ -70,7 +72,7 @@ func (c *Config) readConfig() error {
 		JwtLifeTime:     time.Duration(tokenLifeTime) * time.Hour,
 	}
 
-	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.FilePath == "" || c.IssuerName == "" ||
+	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.FilePath == "" || c.IssuerName == "" ||
 		c.JwtSignatureKey == nil || c.JwtLifeTime == 0 {
 		return errors.New("environment required")
 	}
