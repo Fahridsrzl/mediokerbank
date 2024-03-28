@@ -4,12 +4,12 @@ import (
 	"log"
 	"time"
 
-	"enigmacamp.com/be-enigma-laundry/utils/common"
-	modelutil "enigmacamp.com/be-enigma-laundry/utils/model_util"
+	"medioker-bank/utils/common"
+	modelutil "medioker-bank/utils/model_util"
 	"github.com/gin-gonic/gin"
 )
 
-type LogMiddleware interface {/
+type LogMiddleware interface {
 	LogRequest() gin.HandlerFunc
 }
 

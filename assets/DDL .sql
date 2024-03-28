@@ -61,7 +61,7 @@ CREATE TABLE wallets (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	balance INT,
 	loan_active INT,
-	share_active INT,
+	stock_active INT,
 	user_id UUID,
 	created_at DATE,
 	updated_at DATE,
@@ -117,7 +117,7 @@ CREATE TABLE loan_transaction_details (
     FOREIGN KEY (trx_id) REFERENCES loan_transactions(id) ON DELETE CASCADE
 );
 
-CREATE TABLE share_products (
+CREATE TABLE stock_products (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	company_name VARCHAR(100),
 	rating INT,
@@ -126,7 +126,7 @@ CREATE TABLE share_products (
     updated_at DATE
 );
 
-CREATE TABLE share_transactions (
+CREATE TABLE stock_transactions (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	trx_date VARCHAR(100),
 	user_id UUID,
@@ -135,7 +135,7 @@ CREATE TABLE share_transactions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE share_transaction_details (
+CREATE TABLE stock_transaction_details (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	product_id UUID,
 	amount INT,
@@ -143,8 +143,8 @@ CREATE TABLE share_transaction_details (
 	trx_id UUID,
 	created_at DATE,
 	updated_at DATE,
-    FOREIGN KEY (product_id) REFERENCES share_products(id) ON DELETE CASCADE,
-    FOREIGN KEY (trx_id) REFERENCES share_transactions(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES stock_products(id) ON DELETE CASCADE,
+    FOREIGN KEY (trx_id) REFERENCES stock_transactions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE loans (
@@ -164,16 +164,16 @@ CREATE TABLE loans (
 	FOREIGN KEY (product_id) REFERENCES loan_products(id) ON DELETE CASCADE
 );
 
-CREATE TABLE shares (
+CREATE TABLE stocks (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	wallet_id UUID,
 	product_id UUID,
-	share_price INT,
+	stock_price INT,
 	status VARCHAR(100),
 	created_at DATE,
 	updated_at DATE,
 	FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE,
-	FOREIGN KEY (product_id) REFERENCES share_products(id) ON DELETE CASCADE
+	FOREIGN KEY (product_id) REFERENCES stock_products(id) ON DELETE CASCADE
 );
 
 CREATE TABLE queue_loan_updates (

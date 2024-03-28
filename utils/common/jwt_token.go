@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	"enigmacamp.com/be-enigma-laundry/config"
-	"enigmacamp.com/be-enigma-laundry/model"
-	"enigmacamp.com/be-enigma-laundry/model/dto"
-	modelutil "enigmacamp.com/be-enigma-laundry/utils/model_util"
+	"medioker-bank/config"
+	"medioker-bank/be-enigma-laundry/model"
+	"medioker-bank/model/dto"
+	modelutil "medioker-bank/utils/model_util"
 	"github.com/golang-jwt/jwt/v5"
 )
 

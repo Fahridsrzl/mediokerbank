@@ -3,8 +3,8 @@ package common
 import (
 	"os"
 
-	"enigmacamp.com/be-enigma-laundry/config"
-	modelutil "enigmacamp.com/be-enigma-laundry/utils/model_util"
+	"medioker-bank/config"
+	modelutil "medioker-bank/utils/model_util"
 	"github.com/sirupsen/logrus"
 )
 
