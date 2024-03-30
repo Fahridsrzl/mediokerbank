@@ -16,4 +16,8 @@ const (
 	StockFindMany = "/"
 	StockUpdate   = "/:id"
 	StockDelete   = "/:id"
+
+	UserGroup = "/users"
+	UserAll  = "/"
+	UserId   = "/:id"
 )

@@ -24,6 +24,7 @@ func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	rg := s.engine.Group("/api/v1")
 	controller.NewStockProductController(s.uc.StockProductuseCase(), rg).Router()
+	controller.NewUserController(s.uc.UserUseCase(), rg).Router()
 }
 
 func (s *Server) Run() {
