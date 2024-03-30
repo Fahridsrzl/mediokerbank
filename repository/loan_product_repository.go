@@ -4,20 +4,22 @@ import (
 	"database/sql"
 	"medioker-bank/model"
 	"medioker-bank/utils/common"
+	"time"
 )
+
 type LoanProductRepository interface {
-	Get(id string) (model.LoanProduct, error)
+	GetById(id string) (model.LoanProduct, error)
 	GetAll() ([]model.LoanProduct, error)
 	Create(payload model.LoanProduct) (model.LoanProduct, error)
-	Update(payload model.LoanProduct) error
-	Delete(id string) error
+	Update(id string, payload model.LoanProduct) (model.LoanProduct, error)
+	Delete(id string) (model.LoanProduct, error)
 }
 
 type loanProductRepository struct {
 	db *sql.DB
 }
 
-func (l *loanProductRepository) Get(id string) (model.LoanProduct, error) {
+func (l *loanProductRepository) GetById(id string) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
 	err := l.db.QueryRow(common.GetLoanProductById, id).
 		Scan(
@@ -39,13 +41,11 @@ func (l *loanProductRepository) Get(id string) (model.LoanProduct, error) {
 }
 
 func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
+	var loanProducts []model.LoanProduct
 	rows, err := l.db.Query(common.GetAllLoanProducts)
 	if err != nil {
-		return nil, err
+		return []model.LoanProduct{}, err
 	}
-	defer rows.Close()
-
-	var loanProducts []model.LoanProduct
 
 	for rows.Next() {
 		var loanProduct model.LoanProduct
@@ -69,42 +69,44 @@ func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 }
 
 func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanProduct, error) {
-	var createdProduct model.LoanProduct
+	var createdLoanProduct model.LoanProduct
 	err := l.db.QueryRow(common.CreateLoanProduct,
-		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome).
+		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, time.Now(), time.Now()).
 		Scan(
-			&createdProduct.Id,
-			&createdProduct.Name,
-			&createdProduct.MaxAmount,
-			&createdProduct.PeriodUnit,
-			&createdProduct.MinCreditScore,
-			&createdProduct.MinMonthlyIncome,
-			&createdProduct.CreatedAt,
-			&createdProduct.UpdatedAt,
+			&createdLoanProduct.Id,
+			&createdLoanProduct.Name,
+			&createdLoanProduct.MaxAmount,
+			&createdLoanProduct.PeriodUnit,
+			&createdLoanProduct.MinCreditScore,
+			&createdLoanProduct.MinMonthlyIncome,
+			&createdLoanProduct.CreatedAt,
+			&createdLoanProduct.UpdatedAt,
 		)
 	if err != nil {
 		return model.LoanProduct{}, err
 	}
-	return createdProduct, nil
+	return createdLoanProduct, nil
 }
 
-func (l *loanProductRepository) Update(payload model.LoanProduct) error {
-	_, err := l.db.Exec(common.UpdateLoanProductById,
-		payload.Id, payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome)
+func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (model.LoanProduct, error) {
+	var loanProduct model.LoanProduct
+	err := l.db.QueryRow(common.UpdateLoanProductById,
+		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, time.Now() , time.Now(), id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
 	if err != nil {
-		return err
+		return model.LoanProduct{}, err
 	}
-	return nil
+	return loanProduct, nil
 }
 
-func (l *loanProductRepository) Delete(id string) error {
-	_, err := l.db.Exec(common.DeleteLoanProduct, id)
+func (l *loanProductRepository) Delete(id string) (model.LoanProduct, error) {
+	var loanProduct model.LoanProduct
+	err := l.db.QueryRow(common.DeleteLoanProduct, id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
 	if err != nil {
-		return err
+		return model.LoanProduct{}, err
 	}
-	return nil
+	return loanProduct, nil
 }
 
 func NewLoanProductRepository(db *sql.DB) LoanProductRepository {
-	return &loanProductRepository{db:db}
+	return &loanProductRepository{db: db}
 }

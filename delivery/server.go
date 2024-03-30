@@ -5,17 +5,15 @@ import (
 	"log"
 
 	"medioker-bank/config"
-	"medioker-bank/delivery/controller"
+	controller "medioker-bank/delivery/controller/master"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/manager"
-	"medioker-bank/usecase"
 	"medioker-bank/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
 	uc         manager.UseCaseManager
-	auth       usecase.AuthUseCase
 	engine     *gin.Engine
 	host       string
 	logService common.MyLogger
@@ -23,6 +21,8 @@ type Server struct {
 
 func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
+	rg := s.engine.Group("/api/v1")
+	controller.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
 }
 
 func (s *Server) Run() {
@@ -38,10 +38,15 @@ func NewServer() *Server {
 		log.Fatal(err)
 	}
 
+	infraManager, _ := manager.NewInfraManager(cfg)
+	repoManager := manager.NewRepoManager(infraManager)
+	useCaseManager := manager.NewUseCaseManager(repoManager)
+
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	logService := common.NewMyLogger(cfg.LogFileConfig)
 	return &Server{
+		uc: useCaseManager,
 		engine:     engine,
 		host:       host,
 		logService: logService,

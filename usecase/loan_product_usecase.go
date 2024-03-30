@@ -1,40 +1,41 @@
 package usecase
 
 import (
-	"fmt"
 	"medioker-bank/model"
 	"medioker-bank/repository"
 )
 
 type LoanProductUseCase interface {
-	FindById(id string) (model.LoanProduct, error)
-	GetAll() ([]model.LoanProduct, error)
-	Create(payload model.LoanProduct) (model.LoanProduct, error)
-	Update(payload model.LoanProduct) error
-	Delete(id string) error
+	FindLoanProductById(id string) (model.LoanProduct, error)
+	FindAllLoanProduct() ([]model.LoanProduct, error)
+	CreateLoanProduct(payload model.LoanProduct) (model.LoanProduct, error)
+	UpdateLoanProduct(id string, payload model.LoanProduct) (model.LoanProduct, error)
+	DeleteLoanProduct(id string) (model.LoanProduct, error)
 }
 
-type loanProductUseCase struct{
+type loanProductUseCase struct {
 	repo repository.LoanProductRepository
 }
 
-func (l *loanProductUseCase) FindById(id string)(model.LoanProduct, error){
-	loanProduct, err := l.repo.Get(id)
+func (l *loanProductUseCase) FindLoanProductById(id string) (model.LoanProduct, error) {
+	loanProduct, err := l.repo.GetById(id)
 	if err != nil {
-		return model.LoanProduct{}, fmt.Errorf("loan product with ID %s not found", id)
+		return model.LoanProduct{}, err
 	}
 	return loanProduct, nil
 }
 
-func (l *loanProductUseCase) GetAll() ([]model.LoanProduct, error) {
-	loanProducts, err := l.repo.GetAll()
+func (l *loanProductUseCase) FindAllLoanProduct() ([]model.LoanProduct, error) {
+	var loanProducts []model.LoanProduct
+	var err error
+	loanProducts, err = l.repo.GetAll()
 	if err != nil {
-		return nil, err
+		return []model.LoanProduct{}, err
 	}
 	return loanProducts, nil
 }
 
-func (l *loanProductUseCase)Create(payload model.LoanProduct) (model.LoanProduct, error){
+func (l *loanProductUseCase) CreateLoanProduct(payload model.LoanProduct) (model.LoanProduct, error) {
 	createdLoanProduct, err := l.repo.Create(payload)
 	if err != nil {
 		return model.LoanProduct{}, err
@@ -42,22 +43,22 @@ func (l *loanProductUseCase)Create(payload model.LoanProduct) (model.LoanProduct
 	return createdLoanProduct, nil
 }
 
-func (l *loanProductUseCase)Update(payload model.LoanProduct) error{
-	err := l.repo.Update(payload)
+func (l *loanProductUseCase) UpdateLoanProduct(id string, payload model.LoanProduct) (model.LoanProduct, error) {
+	loanProduct,err := l.repo.Update(id, payload)
 	if err != nil {
-		return err
+		return model.LoanProduct{},err
 	}
-	return nil
+	return loanProduct, nil
 }
 
-func (l *loanProductUseCase) Delete(id string) error {
-	err := l.repo.Delete(id)
+func (l *loanProductUseCase) DeleteLoanProduct(id string) (model.LoanProduct, error) {
+	loanProduct,err := l.repo.Delete(id)
 	if err != nil {
-		return err
+		return model.LoanProduct{}, err
 	}
-	return nil
+	return loanProduct, nil
 }
 
-func NewLoanProductUseCase(repo repository.LoanProductRepository) LoanProductUseCase{
+func NewLoanProductUseCase(repo repository.LoanProductRepository) LoanProductUseCase {
 	return &loanProductUseCase{repo: repo}
 }

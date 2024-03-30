@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"medioker-bank/delivery/middleware"
+	"medioker-bank/config"
 	"medioker-bank/model"
 	"medioker-bank/usecase"
 	"medioker-bank/utils/common"
@@ -13,43 +13,41 @@ import (
 type LoanProductController struct {
 	rg *gin.RouterGroup
 	ul usecase.LoanProductUseCase
-	authMiddleware middleware.AuthMiddleware
 }
 
-func (l *LoanProductController) getHandler(ctx *gin.Context){
+func (l *LoanProductController) GetHandlerById(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if id == ""{
+	if id == "" {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
 		return
 	}
-	loanProdutId := ctx.Param("Id")
-	rspPayload, err := l.ul.FindById(loanProdutId)
-	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
-		return
-	}
-
-	common.SendSingleResponse(ctx, "Ok", rspPayload)
-}
-
-func (l *LoanProductController) getAllHandler(ctx *gin.Context) {
-	rspPayload, err := l.ul.GetAll()
+	response, err := l.ul.FindLoanProductById(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	common.SendSingleResponse(ctx, "Ok", rspPayload)
+	common.SendSingleResponse(ctx, "Succes", response)
 }
 
-func (l *LoanProductController) createHandler(ctx *gin.Context) {
-	var payload model.LoanProduct
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request payload")
+func (l *LoanProductController) GetAllHandler(ctx *gin.Context) {
+	response, err := l.ul.FindAllLoanProduct()
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	createdProduct, err := l.ul.Create(payload)
+	common.SendSingleResponse(ctx, "Succes", response)
+}
+
+func (l *LoanProductController) CreateHandler(ctx *gin.Context) {
+	var payload model.LoanProduct
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	createdProduct, err := l.ul.CreateLoanProduct(payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -57,44 +55,48 @@ func (l *LoanProductController) createHandler(ctx *gin.Context) {
 
 	common.SendSingleResponse(ctx, "Created", createdProduct)
 }
-func (l *LoanProductController) updateHandler(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
-
+func (l *LoanProductController) UpdateHandler(ctx *gin.Context) {
 	var payload model.LoanProduct
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request payload")
+	id := ctx.Param("id")
+	err := ctx.ShouldBindJSON(&payload)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	payload.Id = id // Set ID produk sesuai dengan parameter
-
-	if err := l.ul.Update(payload); err != nil {
+	response, err := l.ul.UpdateLoanProduct(id, payload)
+	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	common.SendSingleResponse(ctx, "Updated successfully", payload.Id)
+	common.SendSingleResponse(ctx, "Updated successfully", response)
 }
 
-func (l *LoanProductController) deleteHandler(ctx *gin.Context) {
+func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
 		return
 	}
 
-	if err := l.ul.Delete(id); err != nil {
+	response, err := l.ul.DeleteLoanProduct(id); if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	common.SendSingleResponse(ctx, "Deleted successfully", http.StatusOK,)
+	common.SendSingleResponse(ctx, "Deleted successfully", response)
 }
 
-func NewLoanProductController(ul usecase.LoanProductUseCase, rg *gin.RouterGroup, authMiddleware middleware.AuthMiddleware) *LoanProductController {
-	return &LoanProductController{ul: ul, rg: rg, authMiddleware: authMiddleware}
+func (l *LoanProductController) Router() {
+	spc := l.rg.Group(config.LoanProductGroup)
+	{
+		spc.POST(config.LoanProductCreate, l.CreateHandler)
+		spc.GET(config.LoanProductFindByid, l.GetHandlerById)
+		spc.GET(config.LoanProductFindAll, l.GetAllHandler)
+		spc.PUT(config.LoanProductUpdate, l.UpdateHandler)
+		spc.DELETE(config.LoanProductDelete, l.DeleteHandler)
+	}
+}
+
+
+func NewLoanProductController(ul usecase.LoanProductUseCase, rg *gin.RouterGroup) *LoanProductController {
+	return &LoanProductController{ul: ul, rg: rg}
 }

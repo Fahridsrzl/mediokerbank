@@ -11,8 +11,6 @@ import (
 
 type ApiConfig struct {
 	ApiPort  string
-	ClientId string
-	ClientSecret string
 }
 
 type DbConfig struct {
