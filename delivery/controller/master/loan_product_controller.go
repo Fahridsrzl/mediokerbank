@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"medioker-bank/config"
+	appconfig "medioker-bank/config/app_config"
 	"medioker-bank/model"
-	"medioker-bank/usecase"
+	usecase "medioker-bank/usecase/master"
 	"medioker-bank/utils/common"
 	"net/http"
 
@@ -86,13 +86,13 @@ func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 }
 
 func (l *LoanProductController) Router() {
-	spc := l.rg.Group(config.LoanProductGroup)
+	spc := l.rg.Group(appconfig.LoanProductGroup)
 	{
-		spc.POST(config.LoanProductCreate, l.CreateHandler)
-		spc.GET(config.LoanProductFindByid, l.GetHandlerById)
-		spc.GET(config.LoanProductFindAll, l.GetAllHandler)
-		spc.PUT(config.LoanProductUpdate, l.UpdateHandler)
-		spc.DELETE(config.LoanProductDelete, l.DeleteHandler)
+		spc.POST(appconfig.LoanProductCreate, l.CreateHandler)
+		spc.GET(appconfig.LoanProductFindByid, l.GetHandlerById)
+		spc.GET(appconfig.LoanProductFindAll, l.GetAllHandler)
+		spc.PUT(appconfig.LoanProductUpdate, l.UpdateHandler)
+		spc.DELETE(appconfig.LoanProductDelete, l.DeleteHandler)
 	}
 }
 

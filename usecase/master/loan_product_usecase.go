@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"medioker-bank/model"
-	"medioker-bank/repository"
+	repository "medioker-bank/repository/master"
 )
 
 type LoanProductUseCase interface {

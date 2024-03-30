@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"medioker-bank/model"
-	"medioker-bank/utils/common"
+	rawquery "medioker-bank/utils/raw_query"
 	"time"
 )
 
@@ -21,7 +21,7 @@ type loanProductRepository struct {
 
 func (l *loanProductRepository) GetById(id string) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
-	err := l.db.QueryRow(common.GetLoanProductById, id).
+	err := l.db.QueryRow(rawquery.GetLoanProductById, id).
 		Scan(
 			&loanProduct.Id,
 			&loanProduct.Name,
@@ -42,7 +42,7 @@ func (l *loanProductRepository) GetById(id string) (model.LoanProduct, error) {
 
 func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 	var loanProducts []model.LoanProduct
-	rows, err := l.db.Query(common.GetAllLoanProducts)
+	rows, err := l.db.Query(rawquery.GetAllLoanProducts)
 	if err != nil {
 		return []model.LoanProduct{}, err
 	}
@@ -70,7 +70,7 @@ func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 
 func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanProduct, error) {
 	var createdLoanProduct model.LoanProduct
-	err := l.db.QueryRow(common.CreateLoanProduct,
+	err := l.db.QueryRow(rawquery.CreateLoanProduct,
 		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, time.Now(), time.Now()).
 		Scan(
 			&createdLoanProduct.Id,
@@ -90,7 +90,7 @@ func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanPro
 
 func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
-	err := l.db.QueryRow(common.UpdateLoanProductById,
+	err := l.db.QueryRow(rawquery.UpdateLoanProductById,
 		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, time.Now() , time.Now(), id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
 	if err != nil {
 		return model.LoanProduct{}, err
@@ -100,7 +100,7 @@ func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (mo
 
 func (l *loanProductRepository) Delete(id string) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
-	err := l.db.QueryRow(common.DeleteLoanProduct, id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
+	err := l.db.QueryRow(rawquery.DeleteLoanProduct, id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
 	if err != nil {
 		return model.LoanProduct{}, err
 	}
