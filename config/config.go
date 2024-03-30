@@ -10,7 +10,7 @@ import (
 )
 
 type ApiConfig struct {
-	ApiPort string
+	ApiPort  string
 }
 
 type DbConfig struct {
@@ -49,12 +49,12 @@ func (c *Config) readConfig() error {
 	}
 
 	c.DbConfig = DbConfig{
-		Host:   os.Getenv("DB_HOST"),
-		Port:   os.Getenv("DB_PORT"),
-		Name:   os.Getenv("DB_NAME"),
-		User:   os.Getenv("DB_USER"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Name:     os.Getenv("DB_NAME"),
+		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
-		Driver: os.Getenv("DB_DRIVER"),
+		Driver:   os.Getenv("DB_DRIVER"),
 	}
 
 	c.LogFileConfig = LogFileConfig{

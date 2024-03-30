@@ -16,4 +16,11 @@ const (
 	StockFindMany = "/"
 	StockUpdate   = "/:id"
 	StockDelete   = "/:id"
+	
+	LoanProductGroup = "/loan-product"
+	LoanProductCreate  = "/"
+	LoanProductFindByid = "/:id"
+	LoanProductFindAll = "/"
+	LoanProductUpdate = "/:id"
+	LoanProductDelete = "/:id"
 )

@@ -24,6 +24,7 @@ func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	rg := s.engine.Group("/api/v1")
 	controller.NewStockProductController(s.uc.StockProductuseCase(), rg).Router()
+	controller.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
 }
 
 func (s *Server) Run() {
@@ -48,6 +49,7 @@ func NewServer() *Server {
 	logService := common.NewMyLogger(cfg.LogFileConfig)
 	return &Server{
 		uc:         usecaseManager,
+
 		engine:     engine,
 		host:       host,
 		logService: logService,
