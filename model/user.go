@@ -8,9 +8,12 @@ type User struct {
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
 	Role        string    `json:"role"`
-	CreditScore string    `json:"creditScore`
+	Status      string    `json:"status"`
+	CreditScore string    `json:"creditScore"`
+	Balance     int       `json:"balance"`
+	LoanActive  int       `json:"loanActive"`
 	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type Profile struct {
@@ -34,15 +37,15 @@ type Profile struct {
 }
 
 type Address struct {
-    ID          string    `json:"id"`
-    AddressLine string    `json:"addressLine"`
-    City        string    `json:"city"`
-    Province    string    `json:"province"`
-    PostalCode  string    `json:"postalCode"`
-    Country     string    `json:"country"`
-    ProfileID   string    `json:"profileID"`
-    CreatedAt   time.Time `json:"createdAt"`
-    UpdatedAt   time.Time `json:"updatedAt"`
+	ID          string    `json:"id"`
+	AddressLine string    `json:"addressLine"`
+	City        string    `json:"city"`
+	Province    string    `json:"province"`
+	PostalCode  string    `json:"postalCode"`
+	Country     string    `json:"country"`
+	ProfileID   string    `json:"profileID"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 func (u User) IsValidRole() bool {

@@ -5,9 +5,11 @@ import (
 	"log"
 
 	"medioker-bank/config"
-	controller "medioker-bank/delivery/controller/master"
+	cMaster "medioker-bank/delivery/controller/master"
+	cOther "medioker-bank/delivery/controller/other"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/manager"
+	oUsecase "medioker-bank/usecase/other"
 	"medioker-bank/utils/common"
 
 	"github.com/gin-gonic/gin"
@@ -18,13 +20,17 @@ type Server struct {
 	engine     *gin.Engine
 	host       string
 	logService common.MyLogger
+	auth       oUsecase.AuthUseCase
+	jwt        common.JwtToken
 }
 
 func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
+	authMiddleware := middleware.NewAuthMiddleware(s.jwt)
 	rg := s.engine.Group("/api/v1")
-	controller.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
-	controller.NewUserController(s.uc.UserUseCase(), rg).Router()
+	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
+	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()
+	cOther.NewAuthController(s.auth, rg, s.jwt).Router()
 }
 
 func (s *Server) Run() {
@@ -47,11 +53,14 @@ func NewServer() *Server {
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	logService := common.NewMyLogger(cfg.LogFileConfig)
+	jwt := common.NewJwtToken(cfg.TokenConfig)
+	mailer := common.NewMailer(cfg.MailerConfig)
 	return &Server{
 		uc:         usecaseManager,
-
 		engine:     engine,
 		host:       host,
 		logService: logService,
+		auth:       oUsecase.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
+		jwt:        jwt,
 	}
 }

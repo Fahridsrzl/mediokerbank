@@ -1,22 +1,24 @@
 package manager
 
-import usecase "medioker-bank/usecase/master"
+import (
+	master "medioker-bank/usecase/master"
+)
 
 type UseCaseManager interface {
-	LoanProductUseCase() usecase.LoanProductUseCase
-	UserUseCase() usecase.UserUseCase
+	LoanProductUseCase() master.LoanProductUseCase
+	UserUseCase() master.UserUseCase
 }
 
 type useCaseManager struct {
 	repo RepoManager
 }
 
-func (u useCaseManager) LoanProductUseCase() usecase.LoanProductUseCase {
-	return usecase.NewLoanProductUseCase(u.repo.LoanProductRepo())
+func (u useCaseManager) LoanProductUseCase() master.LoanProductUseCase {
+	return master.NewLoanProductUseCase(u.repo.LoanProductRepo())
 }
 
-func (u *useCaseManager) UserUseCase() usecase.UserUseCase {
-	return usecase.NewUserUseCase(u.repo.UserRepo())
+func (u *useCaseManager) UserUseCase() master.UserUseCase {
+	return master.NewUserUseCase(u.repo.UserRepo())
 }
 
 func NewUseCaseManager(repo RepoManager) UseCaseManager {
