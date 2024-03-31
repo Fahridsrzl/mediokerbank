@@ -7,43 +7,50 @@ import (
 	"medioker-bank/config"
 	"medioker-bank/model"
 
-	"medioker-bank/model/dto"
 	modelutil "medioker-bank/utils/model_util"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type JwtToken interface {
-	GenerateToken(payload model.User) (dto.AuthResponseDto, error)
+	GenerateToken(payload model.User) (string, error)
+	GenerateRefreshToken(payload model.User) (string, error)
 	VerifyToken(tokenString string) (jwt.MapClaims, error)
-	RefreshToken(oldTokenString string) (dto.AuthResponseDto, error)
+	RefreshToken(oldTokenString string) (string, error)
 }
 
 type jwtToken struct {
 	cfg config.TokenConfig
 }
 
-// RefreshToken implements JwtToken.
-func (j *jwtToken) RefreshToken(oldTokenString string) (dto.AuthResponseDto, error) {
-	token, _ := jwt.Parse(oldTokenString, func(token *jwt.Token) (interface{}, error) {
+func (j *jwtToken) RefreshToken(oldRefreshToken string) (string, error) {
+	token, err := jwt.Parse(oldRefreshToken, func(token *jwt.Token) (interface{}, error) {
 		return j.cfg.JwtSignatureKey, nil
 	})
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["iss"] != j.cfg.IssuerName {
-		return dto.AuthResponseDto{}, errors.New("invalid claim token")
+	if err != nil {
+		return "", err
 	}
 
-	claims["iat"] = float64(time.Now().UTC().UnixNano() / 1e9)
-	claims["exp"] = float64(time.Now().Add(24*time.Hour).UTC().UnixNano() / 1e9)
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["iss"] != j.cfg.IssuerName {
+		return "", errors.New("invalid claim token")
+	}
+
+	if claims["tokenType"] != "refresh token" {
+		return "", errors.New("invalid token type")
+	}
+
+	claims["tokenType"] = "access token"
+	claims["exp"] = float64(time.Now().Add(1*time.Hour).UTC().UnixNano() / 1e9)
 
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	newTokenString, err := newToken.SignedString(j.cfg.JwtSignatureKey)
 	if err != nil {
-		return dto.AuthResponseDto{}, err
+		return "", err
 	}
 
-	return dto.AuthResponseDto{Token: newTokenString}, nil
+	return newTokenString, nil
 }
 
 func (j *jwtToken) VerifyToken(tokenString string) (jwt.MapClaims, error) {
@@ -55,7 +62,6 @@ func (j *jwtToken) VerifyToken(tokenString string) (jwt.MapClaims, error) {
 		return nil, err
 	}
 
-	// kita convert dari token.Claims ke jwt.MapClaims
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !token.Valid || !ok || claims["iss"] != j.cfg.IssuerName {
 		return nil, errors.New("invalid claim token")
@@ -64,23 +70,44 @@ func (j *jwtToken) VerifyToken(tokenString string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func (j *jwtToken) GenerateToken(payload model.User) (dto.AuthResponseDto, error) {
+func (j *jwtToken) GenerateToken(payload model.User) (string, error) {
 	claims := modelutil.JwtTokenClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    j.cfg.IssuerName,
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.JwtLifeTime)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.AccessTokenLifeTime)),
 		},
-		UserId: payload.Id,
-		Role:   payload.Role,
+		UserId:    payload.Id,
+		Role:      payload.Role,
+		TokenType: "access token",
 	}
 
 	jwtNewClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := jwtNewClaims.SignedString(j.cfg.JwtSignatureKey)
 	if err != nil {
-		return dto.AuthResponseDto{}, errors.New("failed to generate token: " + err.Error())
+		return "", errors.New("failed to generate token: " + err.Error())
 	}
-	return dto.AuthResponseDto{Token: token}, nil
+	return token, nil
+}
+
+func (j *jwtToken) GenerateRefreshToken(payload model.User) (string, error) {
+	claims := modelutil.JwtTokenClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    j.cfg.IssuerName,
+			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.RefreshTokenLifeTime)),
+		},
+		UserId:    payload.Id,
+		Role:      payload.Role,
+		TokenType: "refresh token",
+	}
+
+	jwtNewClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := jwtNewClaims.SignedString(j.cfg.JwtSignatureKey)
+	if err != nil {
+		return "", errors.New("failed to generate token: " + err.Error())
+	}
+	return token, nil
 }
 
 func NewJwtToken(cfg config.TokenConfig) JwtToken {

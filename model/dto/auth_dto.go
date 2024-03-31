@@ -1,10 +1,16 @@
 package dto
 
+import "time"
+
 type AuthRegisterDto struct {
 	Username        string `json:"username" binding:"required"`
 	Email           string `json:"email" binding:"required"`
 	Password        string `json:"password" binding:"required"`
 	ConfirmPassword string `json:"confirmPassword" binding:"required"`
+}
+
+type AuthVcodeDto struct {
+	VCode int `json:"vCode" binding:"required"`
 }
 
 type AuthVerifyDto struct {
@@ -21,5 +27,16 @@ type AuthLoginDto struct {
 }
 
 type AuthResponseDto struct {
-	Token string `json:"token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+type Admin struct {
+	Id        string
+	Username  string
+	Email     string
+	Password  string
+	Role      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

@@ -1,17 +1,30 @@
 package manager
 
-import "medioker-bank/repository"
+import (
+	master "medioker-bank/repository/master"
+	other "medioker-bank/repository/other"
+)
 
 type RepoManager interface {
-	StockProductRepo() repository.StockProductRepository
+	LoanProductRepo() master.LoanProductRepository
+	UserRepo() master.UserRepository
+	AuthRepo() other.AuthRepository
 }
 
 type repoManager struct {
 	infra InfraManager
 }
 
-func (r *repoManager) StockProductRepo() repository.StockProductRepository {
-	return repository.NewStockProductRepository(r.infra.Conn())
+func (r *repoManager) LoanProductRepo() master.LoanProductRepository {
+	return master.NewLoanProductRepository(r.infra.Conn())
+}
+
+func (r *repoManager) UserRepo() master.UserRepository {
+	return master.NewUserRepository(r.infra.Conn())
+}
+
+func (r *repoManager) AuthRepo() other.AuthRepository {
+	return other.NewAuthRepository(r.infra.Conn())
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {

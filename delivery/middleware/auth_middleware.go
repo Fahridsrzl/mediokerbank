@@ -25,7 +25,7 @@ func (a *authMiddleware) RequireToken(roles ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var aH authHeader
 		if err := ctx.ShouldBindHeader(&aH); err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized", "error": err.Error()})
 			return
 		}
 
@@ -41,6 +41,11 @@ func (a *authMiddleware) RequireToken(roles ...string) gin.HandlerFunc {
 			return
 		}
 
+		if claims["tokenType"] != "access token" {
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Forbidden Token Type"})
+			return
+		}
+
 		var validRole bool
 		for _, role := range roles {
 			if role == claims["role"] {
@@ -50,7 +55,7 @@ func (a *authMiddleware) RequireToken(roles ...string) gin.HandlerFunc {
 		}
 
 		if !validRole {
-			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Forbidden Resourece"})
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Forbidden Resource"})
 			return
 		}
 
