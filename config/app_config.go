@@ -6,8 +6,10 @@ const (
 	UserAdmin = "adfef570-8c30-43e0-bf5d-3a34ab908fcf"
 
 	AuthGroup        = "/auth"
-	AuthRegister     = "/register"
-	AuthLogin        = "/login"
+	AuthLoginUser    = "/admins/login"
+	AuthRegisterUser = "/users/register"
+	AuthVerifyUser   = "/users/register/verify"
+	AuthLoginAdmin   = "/users/login"
 	AuthRefreshToken = "/refresh-token"
 
 	StockGroup    = "/stocks"

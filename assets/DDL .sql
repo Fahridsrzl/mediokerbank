@@ -4,13 +4,21 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE admins (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	username VARCHAR(100),
-	email VARCHAR(100),
+	username VARCHAR(100) UNIQUE,
+	email VARCHAR(100) UNIQUE,
 	password VARCHAR(100),
 	role VARCHAR(100),
 	created_at DATE,
 	updated_at DATE
 );
+
+CREATE TABLE queue_user_register (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	username VARCHAR(100) UNIQUE,
+	email VARCHAR(100) UNIQUE,
+	password VARCHAR(100),
+	v_code INT UNIQUE
+)
 
 CREATE TABLE users (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -18,6 +26,8 @@ CREATE TABLE users (
 	email VARCHAR(100) UNIQUE,
 	password VARCHAR(100),
 	role VARCHAR(100),
+	balance INT,
+	loan_active INT,
 	credit_score INT,
 	created_at DATE,
 	updated_at DATE
@@ -55,17 +65,6 @@ CREATE TABLE addresses (
 	created_at DATE,
 	updated_at DATE,
     FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE
-);
-
-CREATE TABLE wallets (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	balance INT,
-	loan_active INT,
-	stock_active INT,
-	user_id UUID,
-	created_at DATE,
-	updated_at DATE,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE transfer_transactions (
@@ -117,39 +116,9 @@ CREATE TABLE loan_transaction_details (
     FOREIGN KEY (trx_id) REFERENCES loan_transactions(id) ON DELETE CASCADE
 );
 
-CREATE TABLE stock_products (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	company_name VARCHAR(100),
-	rating INT,
-	risk VARCHAR(100),
-    created_at DATE,
-    updated_at DATE
-);
-
-CREATE TABLE stock_transactions (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	trx_date VARCHAR(100),
-	user_id UUID,
-	created_at DATE,
-	updated_at DATE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE stock_transaction_details (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	product_id UUID,
-	amount INT,
-	purpose VARCHAR(100),
-	trx_id UUID,
-	created_at DATE,
-	updated_at DATE,
-    FOREIGN KEY (product_id) REFERENCES stock_products(id) ON DELETE CASCADE,
-    FOREIGN KEY (trx_id) REFERENCES stock_transactions(id) ON DELETE CASCADE
-);
-
 CREATE TABLE loans (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	wallet_id UUID,
+	user_id UUID,
 	product_id UUID,
 	amount INT,
 	interest INT,
@@ -162,18 +131,6 @@ CREATE TABLE loans (
 	updated_at DATE,
 	FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE,
 	FOREIGN KEY (product_id) REFERENCES loan_products(id) ON DELETE CASCADE
-);
-
-CREATE TABLE stocks (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	wallet_id UUID,
-	product_id UUID,
-	stock_price INT,
-	status VARCHAR(100),
-	created_at DATE,
-	updated_at DATE,
-	FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE,
-	FOREIGN KEY (product_id) REFERENCES stock_products(id) ON DELETE CASCADE
 );
 
 CREATE TABLE queue_loan_updates (
