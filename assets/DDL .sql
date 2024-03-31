@@ -12,6 +12,14 @@ CREATE TABLE admins (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE queue_register_users (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	username VARCHAR(100) UNIQUE,
+	email VARCHAR(100) UNIQUE,
+	password VARCHAR(100),
+	v_code INT UNIQUE
+);
+
 
 CREATE TABLE users (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -86,7 +94,10 @@ CREATE TABLE loan_products (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	name VARCHAR(100),
 	max_amount INT,
-	period_unit VARCHAR(100),
+    min_installment_period INT,
+    max_installment_period INT,
+	installment_period_unit VARCHAR(100),
+	admin_fee INT,
 	min_credit_score INT,
 	min_monthly_income INT,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -161,30 +172,26 @@ CREATE TABLE loans (
 	status VARCHAR(100),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (product_id) REFERENCES loan_products(id) ON DELETE CASCADE
 );
 
-CREATE TABLE stocks (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	wallet_id UUID,
-	product_id UUID,
-	stock_price INT,
-	status VARCHAR(100),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE,
-	FOREIGN KEY (product_id) REFERENCES stock_products(id) ON DELETE CASCADE
-);
-
-CREATE TABLE queue_loan_updates (
+CREATE TABLE installment_transactions (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	trx_date DATE,
 	user_id UUID,
+	status VARCHAR(100),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE installment_transaction_details (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	loan_id UUID UNIQUE,
 	installment_amount INT,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (trx_id) REFERENCES installment_transactions(id) ON DELETE CASCADE,
 	FOREIGN KEY (loan_id) REFERENCES loans(id) ON DELETE CASCADE
 );
