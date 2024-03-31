@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"medioker-bank/model"
 	rawquery "medioker-bank/utils/raw_query"
-	"time"
 )
 
 type LoanProductRepository interface {
@@ -71,7 +70,7 @@ func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanProduct, error) {
 	var createdLoanProduct model.LoanProduct
 	err := l.db.QueryRow(rawquery.CreateLoanProduct,
-		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, time.Now(), time.Now()).
+		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome).
 		Scan(
 			&createdLoanProduct.Id,
 			&createdLoanProduct.Name,
@@ -79,8 +78,6 @@ func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanPro
 			&createdLoanProduct.PeriodUnit,
 			&createdLoanProduct.MinCreditScore,
 			&createdLoanProduct.MinMonthlyIncome,
-			&createdLoanProduct.CreatedAt,
-			&createdLoanProduct.UpdatedAt,
 		)
 	if err != nil {
 		return model.LoanProduct{}, err
@@ -90,8 +87,8 @@ func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanPro
 
 func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
-	err := l.db.QueryRow(rawquery.UpdateLoanProductById,
-		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, time.Now() , time.Now(), id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
+	_, err := l.db.Exec(rawquery.UpdateLoanProductById,
+		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome,id)
 	if err != nil {
 		return model.LoanProduct{}, err
 	}
@@ -100,7 +97,7 @@ func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (mo
 
 func (l *loanProductRepository) Delete(id string) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
-	err := l.db.QueryRow(rawquery.DeleteLoanProduct, id).Scan(&loanProduct.Id, &loanProduct.Name, &loanProduct.MaxAmount, &loanProduct.PeriodUnit, &loanProduct.MinCreditScore, &loanProduct.MinMonthlyIncome, &loanProduct.CreatedAt, &loanProduct.UpdatedAt)
+	_,err := l.db.Exec(rawquery.DeleteLoanProduct, id)
 	if err != nil {
 		return model.LoanProduct{}, err
 	}
