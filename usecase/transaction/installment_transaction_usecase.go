@@ -10,8 +10,6 @@ import (
 	"medioker-bank/utils/common"
 )
 
-// midtrans struct is not final
-
 type InstallmentTransactionUseCase interface {
 	CreateTrx(payload dto.InstallmentTransactionRequestDto) (dto.InstallmentTransactionResponseDto, error)
 	FindTrxById(id string) (model.InstallmentTransaction, error)
@@ -90,6 +88,10 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 			}
 			return dto.InstallmentTransactionResponseDto{}, err
 		}
+		_, err := i.userUc.UpdateUserBalance(user.ID, trxRes.TrxDetail.InstallmentAmount)
+		if err != nil {
+			return dto.InstallmentTransactionResponseDto{}, err
+		}
 		response.PaymentLink = "-"
 		response.Message = "transaction success, your loan updated"
 		response.Transaction = trxRes
@@ -99,10 +101,10 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		newMidTransPayment := dto.MidtransPayment{
 			OrderId:     trxRes.Id,
 			Amount:      trxRes.TrxDetail.InstallmentAmount,
-			FirstName:   user.Username,
-			LastName:    user.Username,
-			Email:       "ikhsanapriliano4@gmail.com",
-			PhoneNumber: "081273645378",
+			FirstName:   user.Profile.FirstName,
+			LastName:    user.Profile.LastName,
+			Email:       user.Email,
+			PhoneNumber: user.Profile.PhoneNumber,
 		}
 		if err != nil {
 			return dto.InstallmentTransactionResponseDto{}, errors.New("repo create: " + err.Error())
@@ -146,8 +148,24 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 func (i *installmentTransactionUseCase) FindTrxById(id string) (model.InstallmentTransaction, error) {
 	trx, err := i.repo.FindById(id)
 	if err != nil {
-		return model.InstallmentTransaction{}, err
+		return model.InstallmentTransaction{}, errors.New("findTrx: " + err.Error())
 	}
+	loans, err := i.loan.FindByUserId(trx.UserId)
+	if err != nil {
+		return model.InstallmentTransaction{}, errors.New("find loans: " + err.Error())
+	}
+	var loan model.Loan
+	for _, item := range loans {
+		if item.Id == trx.TrxDetail.Loan.Id {
+			product, err := i.productUc.FindLoanProductById(item.LoanProduct.Id)
+			if err != nil {
+				return model.InstallmentTransaction{}, errors.New("find loan product :" + err.Error())
+			}
+			item.LoanProduct = product
+			loan = item
+		}
+	}
+	trx.TrxDetail.Loan = loan
 	return trx, err
 }
 
@@ -165,7 +183,27 @@ func (i *installmentTransactionUseCase) FindTrxMany(payload dto.InstallmentTrans
 			return []model.InstallmentTransaction{}, err
 		}
 	}
-	return trxs, nil
+	var transactions []model.InstallmentTransaction
+	for _, trx := range trxs {
+		loans, err := i.loan.FindByUserId(trx.UserId)
+		if err != nil {
+			return []model.InstallmentTransaction{}, errors.New("find loans: " + err.Error())
+		}
+		var loan model.Loan
+		for _, item := range loans {
+			if item.Id == trx.TrxDetail.Loan.Id {
+				product, err := i.productUc.FindLoanProductById(item.LoanProduct.Id)
+				if err != nil {
+					return []model.InstallmentTransaction{}, errors.New("find loan product :" + err.Error())
+				}
+				item.LoanProduct = product
+				loan = item
+			}
+		}
+		trx.TrxDetail.Loan = loan
+		transactions = append(transactions, trx)
+	}
+	return transactions, nil
 }
 
 func (i *installmentTransactionUseCase) FindTrxByUserId(userId string, payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error) {
@@ -173,7 +211,27 @@ func (i *installmentTransactionUseCase) FindTrxByUserId(userId string, payload d
 	if err != nil {
 		return []model.InstallmentTransaction{}, err
 	}
-	return trxs, nil
+	var transactions []model.InstallmentTransaction
+	for _, trx := range trxs {
+		loans, err := i.loan.FindByUserId(trx.UserId)
+		if err != nil {
+			return []model.InstallmentTransaction{}, errors.New("find loans: " + err.Error())
+		}
+		var loan model.Loan
+		for _, item := range loans {
+			if item.Id == trx.TrxDetail.Loan.Id {
+				product, err := i.productUc.FindLoanProductById(item.LoanProduct.Id)
+				if err != nil {
+					return []model.InstallmentTransaction{}, errors.New("find loan product :" + err.Error())
+				}
+				item.LoanProduct = product
+				loan = item
+			}
+		}
+		trx.TrxDetail.Loan = loan
+		transactions = append(transactions, trx)
+	}
+	return transactions, nil
 }
 
 func (i *installmentTransactionUseCase) FindTrxByUserIdAndTrxId(userId, trxId string) (model.InstallmentTransaction, error) {
@@ -181,6 +239,22 @@ func (i *installmentTransactionUseCase) FindTrxByUserIdAndTrxId(userId, trxId st
 	if err != nil {
 		return model.InstallmentTransaction{}, err
 	}
+	loans, err := i.loan.FindByUserId(trx.UserId)
+	if err != nil {
+		return model.InstallmentTransaction{}, errors.New("find loans: " + err.Error())
+	}
+	var loan model.Loan
+	for _, item := range loans {
+		if item.Id == trx.TrxDetail.Loan.Id {
+			product, err := i.productUc.FindLoanProductById(item.LoanProduct.Id)
+			if err != nil {
+				return model.InstallmentTransaction{}, errors.New("find loan product :" + err.Error())
+			}
+			item.LoanProduct = product
+			loan = item
+		}
+	}
+	trx.TrxDetail.Loan = loan
 	return trx, nil
 }
 
