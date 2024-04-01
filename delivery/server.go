@@ -7,30 +7,34 @@ import (
 	"medioker-bank/config"
 	cMaster "medioker-bank/delivery/controller/master"
 	cOther "medioker-bank/delivery/controller/other"
+	cTransaction "medioker-bank/delivery/controller/transaction"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/manager"
 	uOther "medioker-bank/usecase/other"
+	uTransaction "medioker-bank/usecase/transaction"
 	"medioker-bank/utils/common"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	uc         manager.UseCaseManager
-	engine     *gin.Engine
-	host       string
-	logService common.MyLogger
-	auth       uOther.AuthUseCase
-	jwt        common.JwtToken
+	uc             manager.UseCaseManager
+	engine         *gin.Engine
+	host           string
+	logService     common.MyLogger
+	jwt            common.JwtToken
+	auth           uOther.AuthUseCase
+	installmentTrx uTransaction.InstallmentTransactionUseCase
 }
 
 func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
-	authMiddleware := middleware.NewAuthMiddleware(s.jwt)
+	// authMiddleware := middleware.NewAuthMiddleware(s.jwt)
 	rg := s.engine.Group("/api/v1")
 	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
 	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()
 	cOther.NewAuthController(s.auth, rg, s.jwt).Router()
+	cTransaction.NewInstallmentTransactionController(s.installmentTrx, rg).Router()
 }
 
 func (s *Server) Run() {
@@ -55,12 +59,14 @@ func NewServer() *Server {
 	logService := common.NewMyLogger(cfg.LogFileConfig)
 	jwt := common.NewJwtToken(cfg.TokenConfig)
 	mailer := common.NewMailer(cfg.MailerConfig)
+	midtransService := common.NewMidtransService(cfg.MidtransConfig)
 	return &Server{
-		uc:         usecaseManager,
-		engine:     engine,
-		host:       host,
-		logService: logService,
-		auth:       uOther.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
-		jwt:        jwt,
+		uc:             usecaseManager,
+		engine:         engine,
+		host:           host,
+		logService:     logService,
+		jwt:            jwt,
+		auth:           uOther.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
+		installmentTrx: uTransaction.NewInstallmentTransactionUseCase(repoManager.InstallmentTransactionRepo(), repoManager.LoanRepo(), usecaseManager.UserUseCase(), midtransService),
 	}
 }

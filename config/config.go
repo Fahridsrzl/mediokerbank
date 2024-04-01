@@ -40,12 +40,17 @@ type MailerConfig struct {
 	MailerPassword string
 }
 
+type MidtransConfig struct {
+	MidtransServerKey string
+}
+
 type Config struct {
 	ApiConfig
 	DbConfig
 	LogFileConfig
 	TokenConfig
 	MailerConfig
+	MidtransConfig
 }
 
 func (c *Config) readConfig() error {
@@ -99,9 +104,13 @@ func (c *Config) readConfig() error {
 		MailerPassword: os.Getenv("MAILER_PASSWORD"),
 	}
 
+	c.MidtransConfig = MidtransConfig{
+		MidtransServerKey: os.Getenv("MIDTRANS_SERVER_KEY"),
+	}
+
 	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.FilePath == "" || c.IssuerName == "" ||
 		c.JwtSignatureKey == nil || c.AccessTokenLifeTime == 0 || c.RefreshTokenLifeTime == 0 ||
-		c.MailerHost == "" || c.MailerPort == 0 || c.MailerUsername == "" || c.MailerPassword == "" {
+		c.MailerHost == "" || c.MailerPort == 0 || c.MailerUsername == "" || c.MailerPassword == "" || c.MidtransServerKey == "" {
 		return errors.New("environment required")
 	}
 

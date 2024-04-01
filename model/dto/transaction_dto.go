@@ -1,5 +1,7 @@
 package dto
 
+import "medioker-bank/model"
+
 type LoanTransactionRequestDto struct {
 	UserId            string `json:"userId" binding:"required"`
 	ProductId         string `json:"productId" binding:"required"`
@@ -9,8 +11,17 @@ type LoanTransactionRequestDto struct {
 }
 
 type InstallmentTransactionRequestDto struct {
-	UserId            string `json:"userId" binding:"required"`
-	LoanId            string `json:"LoanId" binding:"required"`
-	InstallmentAmount int    `json:"installmentAmount" binding:"required"`
-	PaymentMethod     string `json:"paymentMethod" binding:"required"`
+	UserId        string `json:"userId" binding:"required"`
+	LoanId        string `json:"loanId" binding:"required"`
+	PaymentMethod string `json:"paymentMethod" binding:"required"`
+}
+
+type InstallmentTransactionResponseDto struct {
+	Message     string
+	PaymentLink string
+	Transaction model.InstallmentTransaction
+}
+
+type InstallmentTransactionSearchDto struct {
+	TrxDate string `json:"trxDate"`
 }

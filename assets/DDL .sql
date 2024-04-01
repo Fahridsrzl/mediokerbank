@@ -18,7 +18,7 @@ CREATE TABLE queue_register_users (
   email VARCHAR(100) UNIQUE,
   password VARCHAR(100),
   v_code INT UNIQUE
-)
+);
 
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -72,7 +72,7 @@ CREATE TABLE addresses (
 
 CREATE TABLE topup_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  trx_date DATE DEFAULT CURRENT_TIMESTAMP,
   user_id UUID,
   amount INT,
   status VARCHAR(100),
@@ -83,7 +83,7 @@ CREATE TABLE topup_transactions (
 
 CREATE TABLE transfer_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  trx_date DATE DEFAULT CURRENT_TIMESTAMP,
   sender_id UUID,
   receiver_id UUID,
   amount INT,
@@ -101,6 +101,7 @@ CREATE TABLE loan_products (
   min_installment_period INT,
   max_installment_period INT,
   installment_period_unit VARCHAR(100),
+  admin_fee INT,
   min_credit_score INT,
   min_monthly_income INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -109,7 +110,7 @@ CREATE TABLE loan_products (
 
 CREATE TABLE loan_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  trx_date DATE DEFAULT CURRENT_TIMESTAMP,
   user_id UUID,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -152,7 +153,7 @@ CREATE TABLE loans (
 
 CREATE TABLE installment_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  trx_date DATE DEFAULT CURRENT_TIMESTAMP,
   user_id UUID,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

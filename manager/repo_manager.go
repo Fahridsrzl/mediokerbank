@@ -3,6 +3,7 @@ package manager
 import (
 	master "medioker-bank/repository/master"
 	other "medioker-bank/repository/other"
+	transaction "medioker-bank/repository/transaction"
 )
 
 type RepoManager interface {
@@ -10,6 +11,7 @@ type RepoManager interface {
 	UserRepo() master.UserRepository
 	AuthRepo() other.AuthRepository
 	LoanRepo() master.LoanRepository
+	InstallmentTransactionRepo() transaction.InstallmentTransactionRepository
 }
 
 type repoManager struct {
@@ -30,6 +32,10 @@ func (r *repoManager) AuthRepo() other.AuthRepository {
 
 func (r *repoManager) LoanRepo() master.LoanRepository {
 	return master.NewLoanRepository(r.infra.Conn())
+}
+
+func (r *repoManager) InstallmentTransactionRepo() transaction.InstallmentTransactionRepository {
+	return transaction.NewInstallmentTransactionRepository(r.infra.Conn())
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {

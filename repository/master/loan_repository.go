@@ -9,7 +9,7 @@ import (
 type LoanRepository interface {
 	Create(payload model.Loan) (model.Loan, error)
 	FindByUserId(userId string) ([]model.Loan, error)
-	UpdatePeriod() error
+	UpdatePeriod(loanId string) error
 	Delete(id string) error
 }
 
@@ -47,8 +47,8 @@ func (l *loanRepository) FindByUserId(userId string) ([]model.Loan, error) {
 	return loans, nil
 }
 
-func (l *loanRepository) UpdatePeriod() error {
-	_, err := l.db.Exec(rawquery.UpdateLoanPeriod)
+func (l *loanRepository) UpdatePeriod(loanId string) error {
+	_, err := l.db.Exec(rawquery.UpdateLoanPeriod, loanId)
 	if err != nil {
 		return err
 	}

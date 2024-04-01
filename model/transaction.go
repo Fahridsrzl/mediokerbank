@@ -40,7 +40,7 @@ type InstallmentTransactionDetail struct {
 	Id                string    `json:"id"`
 	Loan              Loan      `json:"loan"`
 	InstallmentAmount int       `json:"installmentAmount"`
-	PaymentMethod     int       `json:"paymentMethod"`
+	PaymentMethod     string    `json:"paymentMethod"`
 	TrxId             string    `json:"trxId"`
 	CreatedAt         time.Time `json:"createdAt"`
 	UpdatedAt         time.Time `json:"updatedAt"`
