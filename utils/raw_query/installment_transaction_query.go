@@ -7,7 +7,7 @@ const (
 	FindInstallmentsBySearch          = `SELECT * FROM installment_transactions WHERE trx_date = $1`
 	FindInstallmentsByUserId          = `SELECT * FROM installment_transactions WHERE user_id = $1`
 	FindInstallmentsByUserIdAndSearch = `SELECT * FROM installment_transactions WHERE user_id = $1 AND trx_date =$2`
-	FindInstallmentByUserIdAndTrxId   = `SELECT * FROM installment_transactions WHERE user_id = $1 AND id = $1`
+	FindInstallmentByUserIdAndTrxId   = `SELECT * FROM installment_transactions WHERE user_id = $1 AND id = $2`
 	UpdateInstallmentById             = `UPDATE installment_transactions SET status = $1 WHERE id = $2`
 	DeleteInstallmentById             = `DELETE FROM installment_transactions WHERE id = $1`
 
