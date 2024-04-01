@@ -8,9 +8,9 @@ type User struct {
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
 	Role        string    `json:"role"`
-	CreditScore string    `json:"creditScore`
+	CreditScore string    `json:"creditScore"`
 	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type Profile struct {

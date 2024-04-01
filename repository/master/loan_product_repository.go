@@ -25,7 +25,10 @@ func (l *loanProductRepository) GetById(id string) (model.LoanProduct, error) {
 			&loanProduct.Id,
 			&loanProduct.Name,
 			&loanProduct.MaxAmount,
-			&loanProduct.PeriodUnit,
+			&loanProduct.MinInstallmentPeriod,
+			&loanProduct.MaxInstallmentPeriod,
+			&loanProduct.InstallmentPeriodUnit,
+			&loanProduct.AdminFee,
 			&loanProduct.MinCreditScore,
 			&loanProduct.MinMonthlyIncome,
 			&loanProduct.CreatedAt,
@@ -52,7 +55,10 @@ func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 			&loanProduct.Id,
 			&loanProduct.Name,
 			&loanProduct.MaxAmount,
-			&loanProduct.PeriodUnit,
+			&loanProduct.MinInstallmentPeriod,
+			&loanProduct.MaxInstallmentPeriod,
+			&loanProduct.InstallmentPeriodUnit,
+			&loanProduct.AdminFee,
 			&loanProduct.MinCreditScore,
 			&loanProduct.MinMonthlyIncome,
 			&loanProduct.CreatedAt,
@@ -70,12 +76,15 @@ func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanProduct, error) {
 	var createdLoanProduct model.LoanProduct
 	err := l.db.QueryRow(rawquery.CreateLoanProduct,
-		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome).
+		payload.Name, payload.MaxAmount, payload.InstallmentPeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome).
 		Scan(
 			&createdLoanProduct.Id,
 			&createdLoanProduct.Name,
 			&createdLoanProduct.MaxAmount,
-			&createdLoanProduct.PeriodUnit,
+			&createdLoanProduct.MinInstallmentPeriod,
+			&createdLoanProduct.MaxInstallmentPeriod,
+			&createdLoanProduct.InstallmentPeriodUnit,
+			&createdLoanProduct.AdminFee,
 			&createdLoanProduct.MinCreditScore,
 			&createdLoanProduct.MinMonthlyIncome,
 		)
@@ -88,7 +97,7 @@ func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanPro
 func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (model.LoanProduct, error) {
 	var loanProduct model.LoanProduct
 	_, err := l.db.Exec(rawquery.UpdateLoanProductById,
-		payload.Name, payload.MaxAmount, payload.PeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome,id)
+		payload.Name, payload.MaxAmount, payload.InstallmentPeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome,id)
 	if err != nil {
 		return model.LoanProduct{}, err
 	}
