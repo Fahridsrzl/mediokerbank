@@ -1,5 +1,6 @@
 package dto
 
+<<<<<<< HEAD
 // contoh createprofile by id
 // photo, idcard, salaryslip diisi setelah generate pathfile
 // type ProfileCreateDto struct {
@@ -20,30 +21,61 @@ package dto
 // 	SalarySlip        string "pathfile"
 // 	UserId            string "binding required"
 // }
+=======
+import "time"
 
-// contoh response saat select user by id
-// {
-// 	"id": "adsdawdasd",
-// 	"username": "hahaha",
-// 	"email": "hahaha@gmail.com",
-// 	"password": "hash#dawdads", "optional"
-// 	"role": "user",
-// 	"status": "verfied",
-// 	"profile": {
-// 		"firstName": "hahaha",
-// 		"dll..."
-// 	},
-// 	"creditScore": 80,
-// 	"balance": 150000,
-// 	"loanActive": 1,
-// 	"loans": [
-// 		{
-// 			"productName": "classic",
-// 			"amount": 800000,
-// 			"installmentPeriod": 5,
-// 			"installmentAmount": 168000,
-// 			"periodLeft": 2,
-// 			"periodUnit": "month"
-// 		}
-// 	]
-// }
+type ProfileCreateDto struct {
+	FirstName         string `json:"firstName"`
+	LastName          string `json:"lastName"`
+	Citizenship       string `json:"citizenship"`
+	NationalID        string `json:"nationalID"`
+	BirthPlace        string `json:"birthPlace"`
+	BirthDate         string `json:"birthDate"`
+	Gender            string `json:"gender"`
+	MaritalStatus     string `json:"maritalStatus"`
+	Occupation        string `json:"occupation"`
+	MonthlyIncome     int    `json:"monthlyIncome"`
+	PhoneNumber       string `json:"phoneNumber"`
+	UrgentPhoneNumber string `json:"urgentPhoneNumber"`
+	Photo             string `json:"photo"`
+	IDCard            string `json:"idCard"`
+	SalarySlip        string `json:"salarySlip"`
+	UserID            string `json:"userID"`
+}
+>>>>>>> users
+
+type AddressCreateDto struct {
+	AddressLine string `json:"addressLine"`
+	City        string `json:"city"`
+	Province    string `json:"province"`
+	PostalCode  string `json:"postalCode"`
+	Country     string `json:"country"`
+}
+
+type ResponseStatus struct {
+	ID          string    `json:"id"`
+	Username    string    `json:"username"`
+	Email       string    `json:"email"`
+	Password    string    `json:"password"`
+	Role        string    `json:"role"`
+	Status      string    `json:"status"`
+	CreditScore int       `json:"creditScore"`
+	Balance     int       `json:"balance"`
+	LoanActive  int       `json:"loanActive"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+type UserDto struct {
+	ID          string    `json:"id"`
+	Username    string    `json:"username"`
+	Email       string    `json:"email"`
+	Password    string    `json:"password"`
+	Role        string    `json:"role"`
+	Status      string    `json:"status"`
+	CreditScore int       `json:"creditScore"`
+	Balance     int       `json:"balance"`
+	LoanActive  int       `json:"loanActive"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}

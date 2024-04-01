@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"fmt"
 	appconfig "medioker-bank/config/app_config"
-	"medioker-bank/model"
+	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/master"
 	"medioker-bank/utils/common"
 	"net/http"
@@ -17,97 +16,95 @@ type UserController struct {
 }
 
 func (u *UserController) createHandler(ctx *gin.Context) {
-	var payload model.User
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
+	var inputData struct {
+		ProfileDto dto.ProfileCreateDto `json:"profileDto"`
+		AddressDto dto.AddressCreateDto `json:"addressDto"`
+	}
+	if err := ctx.ShouldBindJSON(&inputData); err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-	respPayload, err := u.uc.RegisterNewUser(payload)
+
+	// Call use case to create user, profile, and address
+	_, _, _, err := u.uc.CreateProfileAndAddressThenUpdateUser(inputData.ProfileDto, inputData.AddressDto)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	// Prepare response payload
+	respPayload := "Success Create Profile, Please Wait For Verified"
 
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
-func (u *UserController) getHandler(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
-	respPayload, err := u.uc.FindById(id)
-	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
-		return
-	}
+func (e *UserController) getStatusHandler(ctx *gin.Context) {
+	status := ctx.Param("status")
 
-	common.SendSingleResponse(ctx, "ok", respPayload)
-}
-
-func (u *UserController) getallhandler(ctx *gin.Context) {
-	users, err := u.uc.ShowAllUser()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get users"})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "ok", "data": users})
-}
-
-func (u *UserController) updateHandler(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
-
-	var updateUser model.User
-	if err := ctx.BindJSON(&updateUser); err != nil {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request payload")
-		return
-	}
-
-	updateUser.Id = id
-
-	err := u.uc.ModifyUser(id, updateUser)
+	response, err := e.uc.FindByStatus(status)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	updatedUser, err := u.uc.FindById(id)
+	common.SendCreateResponse(ctx, "ok", response)
+}
+
+func (e *UserController) updateHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	response, err := e.uc.UpdateStatus(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	common.SendSingleResponse(ctx, "ok", updatedUser)
+	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (u *UserController) deleteHandler(ctx *gin.Context) {
+func (e *UserController) getIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
-	err := u.uc.RemoveUser(id)
+
+	response, err := e.uc.GetUserByID(id)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("failed to delete user: %s", id))
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	common.SendSingleResponse(ctx, "ok", nil)
+	common.SendSingleResponse(ctx, "ok", response)
+}
+
+func (e *UserController) deletehandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	response, err := e.uc.RemoveUser(id)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "delete", response)
+}
+
+func (u *UserController) getAllUserHandler(ctx *gin.Context) {
+	users, err := u.uc.GetAllUser()
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Set response headers and send JSON data
+	ctx.JSON(http.StatusOK, users)
 }
 
 func (u *UserController) Router() {
 	ur := u.rg.Group(appconfig.UserGroup)
 	ur.POST(appconfig.UserAll, u.createHandler)
-	ur.GET(appconfig.UserId, u.getHandler)
-	ur.GET(appconfig.UserAll, u.getallhandler)
-	ur.DELETE(appconfig.UserId, u.deleteHandler)
+	ur.GET(appconfig.UserStatus, u.getStatusHandler)
+	ur.GET(appconfig.UserId, u.getIdHandler)
+	ur.GET(appconfig.UserAll, u.getAllUserHandler)
 	ur.PUT(appconfig.UserId, u.updateHandler)
+	ur.DELETE(appconfig.UserId, u.deletehandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {

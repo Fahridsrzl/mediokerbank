@@ -26,7 +26,7 @@ type Server struct {
 
 func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
-	authMiddleware := middleware.NewAuthMiddleware(s.jwt)
+	// authMiddleware := middleware.NewAuthMiddleware(s.jwt)
 	rg := s.engine.Group("/api/v1")
 	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
 	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()

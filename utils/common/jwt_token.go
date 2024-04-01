@@ -77,7 +77,7 @@ func (j *jwtToken) GenerateToken(payload model.User) (string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.AccessTokenLifeTime)),
 		},
-		UserId:    payload.Id,
+		UserId:    payload.ID,
 		Role:      payload.Role,
 		TokenType: "access token",
 	}
@@ -97,7 +97,7 @@ func (j *jwtToken) GenerateRefreshToken(payload model.User) (string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.RefreshTokenLifeTime)),
 		},
-		UserId:    payload.Id,
+		UserId:    payload.ID,
 		Role:      payload.Role,
 		TokenType: "refresh token",
 	}
