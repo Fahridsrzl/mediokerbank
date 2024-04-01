@@ -35,6 +35,8 @@ func (s *Server) setupControllers() {
 	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()
 	cOther.NewAuthController(s.auth, rg, s.jwt).Router()
 	cTransaction.NewInstallmentTransactionController(s.installmentTrx, rg).Router()
+	cTransaction.NewTopupController(s.uc.TopupUseCase(), rg).Router()
+	cTransaction.NewTransferController(s.uc.TransferUseCase(), rg).Router()
 }
 
 func (s *Server) Run() {

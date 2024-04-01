@@ -12,6 +12,8 @@ type RepoManager interface {
 	AuthRepo() other.AuthRepository
 	LoanRepo() master.LoanRepository
 	InstallmentTransactionRepo() transaction.InstallmentTransactionRepository
+	TopupRepo() transaction.TopupRepository
+	TransferRepo() transaction.TransferRepository
 }
 
 type repoManager struct {
@@ -36,6 +38,14 @@ func (r *repoManager) LoanRepo() master.LoanRepository {
 
 func (r *repoManager) InstallmentTransactionRepo() transaction.InstallmentTransactionRepository {
 	return transaction.NewInstallmentTransactionRepository(r.infra.Conn())
+}
+
+func (r *repoManager) TopupRepo() transaction.TopupRepository {
+	return transaction.NewTopupTransactionRepository(r.infra.Conn())
+}
+
+func (r *repoManager) TransferRepo() transaction.TransferRepository {
+	return transaction.NewTransferTransactionRepository(r.infra.Conn())
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {
