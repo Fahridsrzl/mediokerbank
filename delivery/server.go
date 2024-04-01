@@ -7,6 +7,7 @@ import (
 	"medioker-bank/config"
 	cMaster "medioker-bank/delivery/controller/master"
 	cOther "medioker-bank/delivery/controller/other"
+	cTransaction "medioker-bank/delivery/controller/transaction"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/manager"
 	uOther "medioker-bank/usecase/other"
@@ -31,6 +32,7 @@ func (s *Server) setupControllers() {
 	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
 	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()
 	cOther.NewAuthController(s.auth, rg, s.jwt).Router()
+	cTransaction.NewTopupController(s.uc.TopupUseCase(), rg).Router()
 }
 
 func (s *Server) Run() {
