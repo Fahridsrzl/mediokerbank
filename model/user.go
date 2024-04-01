@@ -3,14 +3,18 @@ package model
 import "time"
 
 type User struct {
-	Id          string    `json:"id"`
+	ID          string    `json:"id"`
 	Username    string    `json:"username"`
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
 	Role        string    `json:"role"`
-	CreditScore string    `json:"creditScore`
+	Status      string    `json:"status"`
+	CreditScore int       `json:"creditScore"`
+	Balance     int       `json:"balance"`
+	LoanActive  int       `json:"loanActive"`
 	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Profile     Profile   `json:"profile"`
 }
 
 type Profile struct {
@@ -28,23 +32,23 @@ type Profile struct {
 	PhoneNumber       string    `json:"phoneNumber"`
 	UrgentPhoneNumber string    `json:"urgentPhoneNumber"`
 	Photo             string    `json:"photo"`
+	IDCard            string    `json:"idCard"`
+	SalarySlip        string    `json:"salarySlip"`
 	UserID            string    `json:"userID"`
 	CreatedAt         time.Time `json:"createdAt"`
 	UpdatedAt         time.Time `json:"updatedAt"`
+	Address           Address   `json:"address"`
 }
 
 type Address struct {
-    ID          string    `json:"id"`
-    AddressLine string    `json:"addressLine"`
-    City        string    `json:"city"`
-    Province    string    `json:"province"`
-    PostalCode  string    `json:"postalCode"`
-    Country     string    `json:"country"`
-    ProfileID   string    `json:"profileID"`
-    CreatedAt   time.Time `json:"createdAt"`
-    UpdatedAt   time.Time `json:"updatedAt"`
+	ID          string    `json:"id"`
+	AddressLine string    `json:"addressLine"`
+	City        string    `json:"city"`
+	Province    string    `json:"province"`
+	PostalCode  string    `json:"postalCode"`
+	Country     string    `json:"country"`
+	ProfileID   string    `json:"profileID"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
-func (u User) IsValidRole() bool {
-	return u.Role == "admin"
-}
