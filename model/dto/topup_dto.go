@@ -1,10 +1,14 @@
-package model
+package dto
 
-import (
-	"time"
-)
+import "time"
 
-type TopupTransaction struct {
+type TopupDto struct {
+	UserID string `json:"userId"`
+	Amount int    `json:"amount"`
+	Status string `json:"status"`
+}
+
+type ResponseTopUp struct {
 	ID        string    `json:"id"`
 	TrxDate   time.Time `json:"trxDate"`
 	UserID    string    `json:"userId"`

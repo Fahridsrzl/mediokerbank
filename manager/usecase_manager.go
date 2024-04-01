@@ -9,6 +9,7 @@ type UseCaseManager interface {
 	LoanProductUseCase() master.LoanProductUseCase
 	UserUseCase() master.UserUseCase
 	TopupUseCase() transaction.TopupUseCase
+	TransferUseCase() transaction.TransferUseCase
 }
 
 type useCaseManager struct {
@@ -25,6 +26,10 @@ func (u *useCaseManager) UserUseCase() master.UserUseCase {
 
 func (u *useCaseManager) TopupUseCase() transaction.TopupUseCase {
 	return transaction.NewTopupTransactionUseCase(u.repo.TopupRepo())
+}
+
+func (u *useCaseManager) TransferUseCase() transaction.TransferUseCase {
+	return transaction.NewTransferTransactionUseCase(u.repo.TransferRepo())
 }
 
 func NewUseCaseManager(repo RepoManager) UseCaseManager {
