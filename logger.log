@@ -28,3 +28,5 @@ time="2024-04-02T03:39:32+07:00" level=info msg="{2024-04-02 03:39:31.9450291 +0
 time="2024-04-02T03:40:40+07:00" level=info msg="{2024-04-02 03:40:40.740782 +0700 +07 m=+8.137861101 82.654ms ::1 GET 200 /api/v1/transactions/installments/users/f2f44164-0e1b-4e63-ba2d-af6d189511b7 PostmanRuntime/7.37.0}"
 time="2024-04-02T03:40:58+07:00" level=fatal msg="{2024-04-02 03:40:58.6177685 +0700 +07 m=+26.014847601 0s ::1 GET 500 /api/v1/transactions/installments/users/f2f44164-0e1b-4e63-ba2d-af6d189511b7/54adedf4-2966-4173-be28-902f5ed0f6c4 PostmanRuntime/7.37.0}"
 time="2024-04-02T03:41:47+07:00" level=info msg="{2024-04-02 03:41:47.1593144 +0700 +07 m=+4.490959101 45.128ms ::1 GET 200 /api/v1/transactions/installments/users/f2f44164-0e1b-4e63-ba2d-af6d189511b7/54adedf4-2966-4173-be28-902f5ed0f6c4 PostmanRuntime/7.37.0}"
+time="2024-04-02T05:02:51+07:00" level=fatal msg="{2024-04-02 05:02:51.1670628 +0700 +07 m=+799.954001201 90.9626ms ::1 POST 500 /api/v1/users/ PostmanRuntime/7.37.0}"
+time="2024-04-02T05:12:09+07:00" level=info msg="{2024-04-02 05:12:09.1818033 +0700 +07 m=+1357.968741701 39.1277ms ::1 POST 201 /api/v1/users/ PostmanRuntime/7.37.0}"
