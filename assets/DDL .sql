@@ -9,7 +9,7 @@ CREATE TABLE admins (
   password VARCHAR(100),
   role VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE queue_register_users (
@@ -31,7 +31,7 @@ CREATE TABLE users (
   balance INT,
   loan_active INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE profiles (
@@ -51,9 +51,9 @@ CREATE TABLE profiles (
   photo VARCHAR(100),
   id_card VARCHAR(100),
   salary_slip VARCHAR(100),
-    user_id UUID UNIQUE,
+  user_id UUID UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -64,32 +64,32 @@ CREATE TABLE addresses (
   province VARCHAR(100),
   postal_code VARCHAR(100),
   country VARCHAR(100),
-    profile_id UUID UNIQUE,
+  profile_id UUID UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE
 );
 
 CREATE TABLE topup_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date VARCHAR(100),
+  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   user_id UUID,
   amount INT,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE transfer_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date VARCHAR(100),
+  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   sender_id UUID,
   receiver_id UUID,
   amount INT,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -98,23 +98,23 @@ CREATE TABLE loan_products (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(100),
   max_amount INT,
-    min_installment_period INT,
-    max_installment_period INT,
+  min_installment_period INT,
+  max_installment_period INT,
   installment_period_unit VARCHAR(100),
   min_credit_score INT,
   min_monthly_income INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE loan_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date VARCHAR(100),
+  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   user_id UUID,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE loan_transaction_details (
@@ -128,9 +128,9 @@ CREATE TABLE loan_transaction_details (
   installment_amount INT,
   trx_id UUID UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES loan_products(id) ON DELETE CASCADE,
-    FOREIGN KEY (trx_id) REFERENCES loan_transactions(id) ON DELETE CASCADE
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES loan_products(id) ON DELETE CASCADE,
+  FOREIGN KEY (trx_id) REFERENCES loan_transactions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE loans (
@@ -145,18 +145,18 @@ CREATE TABLE loans (
   period_left INT,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES loan_products(id) ON DELETE CASCADE
 );
 
 CREATE TABLE installment_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  trx_date DATE,
+  trx_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   user_id UUID,
   status VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -167,7 +167,7 @@ CREATE TABLE installment_transaction_details (
   payment_method VARCHAR(100),
   trx_id UUID UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (trx_id) REFERENCES installment_transactions(id) ON DELETE CASCADE,
   FOREIGN KEY (loan_id) REFERENCES loans(id) ON DELETE CASCADE
 );

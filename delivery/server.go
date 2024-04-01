@@ -9,7 +9,7 @@ import (
 	cOther "medioker-bank/delivery/controller/other"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/manager"
-	oUsecase "medioker-bank/usecase/other"
+	uOther "medioker-bank/usecase/other"
 	"medioker-bank/utils/common"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +20,7 @@ type Server struct {
 	engine     *gin.Engine
 	host       string
 	logService common.MyLogger
-	auth       oUsecase.AuthUseCase
+	auth       uOther.AuthUseCase
 	jwt        common.JwtToken
 }
 
@@ -60,7 +60,7 @@ func NewServer() *Server {
 		engine:     engine,
 		host:       host,
 		logService: logService,
-		auth:       oUsecase.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
+		auth:       uOther.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
 		jwt:        jwt,
 	}
 }
