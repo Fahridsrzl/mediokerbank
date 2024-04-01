@@ -135,7 +135,7 @@ func (a *authUseCase) LoginAdmin(payload dto.AuthLoginDto) (dto.AuthResponseDto,
 		return dto.AuthResponseDto{}, err
 	}
 	mockUser := model.User{
-		Id:   admin.Id,
+		ID:   admin.Id,
 		Role: admin.Role,
 	}
 	accessToken, err := a.jwt.GenerateToken(mockUser)
