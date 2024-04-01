@@ -9,6 +9,7 @@ type RepoManager interface {
 	LoanProductRepo() master.LoanProductRepository
 	UserRepo() master.UserRepository
 	AuthRepo() other.AuthRepository
+	LoanRepo() master.LoanRepository
 }
 
 type repoManager struct {
@@ -25,6 +26,10 @@ func (r *repoManager) UserRepo() master.UserRepository {
 
 func (r *repoManager) AuthRepo() other.AuthRepository {
 	return other.NewAuthRepository(r.infra.Conn())
+}
+
+func (r *repoManager) LoanRepo() master.LoanRepository {
+	return master.NewLoanRepository(r.infra.Conn())
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {
