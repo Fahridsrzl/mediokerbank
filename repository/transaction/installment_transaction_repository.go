@@ -2,9 +2,11 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
+	"time"
 )
 
 type InstallmentTransactionRepository interface {
@@ -14,7 +16,7 @@ type InstallmentTransactionRepository interface {
 	FindMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error)
 	FindByUserId(userId string, payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error)
 	FindByUserIdAndTrxId(userId, trxId string) (model.InstallmentTransaction, error)
-	UpdateById(id string) error
+	UpdateById(id string) (string, error)
 	DeleteById(id string) error
 }
 
@@ -24,17 +26,41 @@ type installmentTransactionRepository struct {
 
 func (i *installmentTransactionRepository) Create(payload model.InstallmentTransaction) (model.InstallmentTransaction, error) {
 	var trx model.InstallmentTransaction
-	err := i.db.QueryRow(rawquery.CreateInstallment, payload.UserId, payload.Status).Scan(
-		&trx.Id, &trx.TrxDate, &trx.UserId, &trx.Status, &trx.CreatedAt, &trx.UpdatedAt,
-	)
+	tx, err := i.db.Begin()
 	if err != nil {
 		return model.InstallmentTransaction{}, err
 	}
+	var status string
+	var id string
+	var timestamp time.Time
+	_ = i.db.QueryRow(rawquery.FindStatusByLoanId, payload.TrxDetail.Loan.Id, "pending").Scan(&status, &id, &timestamp)
+	if status == "pending" {
+		if int64(timestamp.Add(30*time.Minute).Unix()) < int64(time.Now().Unix()) {
+			_, err := tx.Exec(rawquery.UpdateInstallmentById, "expired", id)
+			if err != nil {
+				tx.Rollback()
+				return model.InstallmentTransaction{}, err
+			}
+		}
+		return model.InstallmentTransaction{}, errors.New("previous payment bill is still active, can't make a new bill payment")
+	}
+	err = tx.QueryRow(rawquery.CreateInstallment, payload.UserId, payload.Status).Scan(
+		&trx.Id, &trx.TrxDate, &trx.UserId, &trx.Status, &trx.CreatedAt, &trx.UpdatedAt,
+	)
+	if err != nil {
+		tx.Rollback()
+		return model.InstallmentTransaction{}, errors.New("installment: " + err.Error())
+	}
 	payloadTrxd := payload.TrxDetail
-	err = i.db.QueryRow(rawquery.CreateInstallmentDetail, payloadTrxd.Loan.Id, payloadTrxd.InstallmentAmount, payloadTrxd.PaymentMethod, payloadTrxd.TrxId).Scan(
+	err = tx.QueryRow(rawquery.CreateInstallmentDetail, payloadTrxd.Loan.Id, payloadTrxd.InstallmentAmount, payloadTrxd.PaymentMethod, trx.Id).Scan(
 		&trx.TrxDetail.Id, &trx.TrxDetail.Loan.Id, &trx.TrxDetail.InstallmentAmount, &trx.TrxDetail.PaymentMethod, &trx.TrxDetail.TrxId, &trx.TrxDetail.CreatedAt, &trx.TrxDetail.UpdatedAt,
 	)
 	if err != nil {
+		tx.Rollback()
+		return model.InstallmentTransaction{}, errors.New("trxdetail:" + err.Error())
+	}
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
 		return model.InstallmentTransaction{}, err
 	}
 	return trx, nil
@@ -215,12 +241,17 @@ func (i *installmentTransactionRepository) FindByUserIdAndTrxId(userId, trxId st
 	return trx, nil
 }
 
-func (i *installmentTransactionRepository) UpdateById(id string) error {
+func (i *installmentTransactionRepository) UpdateById(id string) (string, error) {
 	_, err := i.db.Exec(rawquery.UpdateInstallmentById, "success", id)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	var loanId string
+	err = i.db.QueryRow(rawquery.SelectLoanIdOnTrxd, id).Scan(&loanId)
+	if err != nil {
+		return "", err
+	}
+	return loanId, nil
 }
 
 func (i *installmentTransactionRepository) DeleteById(id string) error {

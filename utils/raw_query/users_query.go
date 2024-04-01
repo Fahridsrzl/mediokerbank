@@ -63,10 +63,9 @@ JOIN
     addresses a ON p.id = a.profile_id
 WHERE
     u.id = $1`
-	
+
 	DeleteUser = `DELETE FROM users WHERE id = $1`
 
 	GetAllUser = `SELECT id, username, email, role, status, credit_score, balance, loan_active, created_at, updated_at
 	FROM users`
-
 )

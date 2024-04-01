@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
@@ -190,63 +191,62 @@ func (u *userRepository) GetUserByStatus(status string) ([]dto.ResponseStatus, e
 	return users, nil
 }
 
-
 func (u *userRepository) GetUserByID(id string) (model.User, error) {
-    var user model.User
-    var profile model.Profile
-    var address model.Address
+	var user model.User
+	var profile model.Profile
+	var address model.Address
 
-    err := u.db.QueryRow(rawquery.GetUserById, id).Scan(
-        &user.ID,
-        &user.Username,
-        &user.Email,
-        &user.Password,
-        &user.Role,
-        &user.Status,
-        &user.CreditScore,
-        &user.Balance,
-        &user.LoanActive,
-        &user.CreatedAt,
-        &user.UpdatedAt,
-        &profile.ID,
-        &profile.FirstName,
-        &profile.LastName,
-        &profile.Citizenship,
-        &profile.NationalID,
-        &profile.BirthPlace,
-        &profile.BirthDate,
-        &profile.Gender,
-        &profile.MaritalStatus,
-        &profile.Occupation,
-        &profile.MonthlyIncome,
-        &profile.PhoneNumber,
-        &profile.UrgentPhoneNumber,
-        &profile.Photo,
-        &profile.IDCard,
-        &profile.SalarySlip,
-        &profile.UserID,
-        &profile.CreatedAt,
-        &profile.UpdatedAt,
-        &address.ID,
-        &address.AddressLine,
-        &address.City,
-        &address.Province,
-        &address.PostalCode,
-        &address.Country,
-        &address.ProfileID,
-        &address.CreatedAt,
-        &address.UpdatedAt,
-    )
-    if err != nil {
-        return model.User{}, err
-    }
+	err := u.db.QueryRow(rawquery.GetUserById, id).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Role,
+		&user.Status,
+		&user.CreditScore,
+		&user.Balance,
+		&user.LoanActive,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&profile.ID,
+		&profile.FirstName,
+		&profile.LastName,
+		&profile.Citizenship,
+		&profile.NationalID,
+		&profile.BirthPlace,
+		&profile.BirthDate,
+		&profile.Gender,
+		&profile.MaritalStatus,
+		&profile.Occupation,
+		&profile.MonthlyIncome,
+		&profile.PhoneNumber,
+		&profile.UrgentPhoneNumber,
+		&profile.Photo,
+		&profile.IDCard,
+		&profile.SalarySlip,
+		&profile.UserID,
+		&profile.CreatedAt,
+		&profile.UpdatedAt,
+		&address.ID,
+		&address.AddressLine,
+		&address.City,
+		&address.Province,
+		&address.PostalCode,
+		&address.Country,
+		&address.ProfileID,
+		&address.CreatedAt,
+		&address.UpdatedAt,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
 
-    user.Profile = profile
-    user.Profile.Address = address
+	user.Profile = profile
+	user.Profile.Address = address
 
-    return user, nil
+	fmt.Println(user)
+	return user, nil
 }
-
 
 func (u *userRepository) DeleteUser(id string) (model.User, error) {
 	var user model.User
@@ -289,7 +289,6 @@ func (u *userRepository) GetAllUsers() ([]dto.UserDto, error) {
 	}
 	return users, nil
 }
-
 
 func NewUserRepository(db *sql.DB) UserRepository {
 	return &userRepository{db: db}

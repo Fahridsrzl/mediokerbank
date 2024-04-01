@@ -1,7 +1,7 @@
 package dto
 
 type MidtransPayment struct {
-	TrxId       string
+	OrderId     string
 	Amount      int
 	FirstName   string
 	LastName    string

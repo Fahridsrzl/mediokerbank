@@ -25,6 +25,7 @@ type installmentTransactionUseCase struct {
 	repo            transaction.InstallmentTransactionRepository
 	loan            master.LoanRepository
 	userUc          usecase.UserUseCase
+	productUc       usecase.LoanProductUseCase
 	midtransService common.MidtransService
 }
 
@@ -51,6 +52,11 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 			loan = item
 		}
 	}
+	loanProduct, err := i.productUc.FindLoanProductById(loan.LoanProduct.Id)
+	if err != nil {
+		return dto.InstallmentTransactionResponseDto{}, err
+	}
+	loan.LoanProduct = loanProduct
 	trxd := model.InstallmentTransactionDetail{
 		Loan:              loan,
 		InstallmentAmount: loan.InstallmentAmount,
@@ -60,7 +66,7 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		UserId:    payload.UserId,
 		TrxDetail: trxd,
 	}
-	user, err := i.userUc.FindById(trxReq.UserId)
+	user, err := i.userUc.GetUserByID(trxReq.UserId)
 	if err != nil {
 		return dto.InstallmentTransactionResponseDto{}, err
 	}
@@ -89,17 +95,17 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		response.Transaction = trxRes
 	case "payment gateway":
 		trxReq.Status = "pending"
+		trxRes, err = i.repo.Create(trxReq)
 		newMidTransPayment := dto.MidtransPayment{
-			TrxId:       trxReq.Id,
-			Amount:      trxReq.TrxDetail.InstallmentAmount,
+			OrderId:     trxRes.Id,
+			Amount:      trxRes.TrxDetail.InstallmentAmount,
 			FirstName:   user.Username,
 			LastName:    user.Username,
-			Email:       user.Email,
+			Email:       "ikhsanapriliano4@gmail.com",
 			PhoneNumber: "081273645378",
 		}
-		trxRes, err = i.repo.Create(trxReq)
 		if err != nil {
-			return dto.InstallmentTransactionResponseDto{}, err
+			return dto.InstallmentTransactionResponseDto{}, errors.New("repo create: " + err.Error())
 		}
 		paymentLink, err := i.midtransService.CreatePayment(newMidTransPayment)
 		if err != nil {
@@ -111,7 +117,27 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		}
 		response.PaymentLink = paymentLink
 		response.Message = "transaction success, check the link below to finish your payment"
-		response.Transaction = trxRes
+	}
+	trxRes.TrxDetail.Loan = loan
+	response.Transaction = trxRes
+
+	newLoans, err := i.loan.FindByUserId(payload.UserId)
+	if err != nil {
+		return dto.InstallmentTransactionResponseDto{}, err
+	}
+	var newLoan model.Loan
+	for _, item := range newLoans {
+		if item.Id != payload.LoanId {
+			return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
+		} else {
+			newLoan = item
+		}
+	}
+	if newLoan.PeriodLeft == 0 {
+		err := i.loan.Delete(newLoan.Id)
+		if err != nil {
+			return dto.InstallmentTransactionResponseDto{}, err
+		}
 	}
 
 	return response, nil
@@ -159,17 +185,17 @@ func (i *installmentTransactionUseCase) FindTrxByUserIdAndTrxId(userId, trxId st
 }
 
 func (i *installmentTransactionUseCase) UpdateTrxById(id string) error {
-	err := i.repo.UpdateById(id)
+	loanId, err := i.repo.UpdateById(id)
 	if err != nil {
 		return err
 	}
-	err = i.loan.UpdatePeriod(id)
+	err = i.loan.UpdatePeriod(loanId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func NewInstallmentTransactionUseCase(repo transaction.InstallmentTransactionRepository, loan master.LoanRepository, userUc usecase.UserUseCase, midtransService common.MidtransService) InstallmentTransactionUseCase {
-	return &installmentTransactionUseCase{repo: repo, loan: loan, userUc: userUc, midtransService: midtransService}
+func NewInstallmentTransactionUseCase(repo transaction.InstallmentTransactionRepository, loan master.LoanRepository, userUc usecase.UserUseCase, productUc usecase.LoanProductUseCase, midtransService common.MidtransService) InstallmentTransactionUseCase {
+	return &installmentTransactionUseCase{repo: repo, loan: loan, userUc: userUc, productUc: productUc, midtransService: midtransService}
 }

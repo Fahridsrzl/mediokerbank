@@ -67,6 +67,6 @@ func NewServer() *Server {
 		logService:     logService,
 		jwt:            jwt,
 		auth:           uOther.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
-		installmentTrx: uTransaction.NewInstallmentTransactionUseCase(repoManager.InstallmentTransactionRepo(), repoManager.LoanRepo(), usecaseManager.UserUseCase(), midtransService),
+		installmentTrx: uTransaction.NewInstallmentTransactionUseCase(repoManager.InstallmentTransactionRepo(), repoManager.LoanRepo(), usecaseManager.UserUseCase(), usecaseManager.LoanProductUseCase(), midtransService),
 	}
 }

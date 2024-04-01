@@ -22,7 +22,7 @@ func (m *midtransService) CreatePayment(payload dto.MidtransPayment) (string, er
 
 	req := &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
-			OrderID:  payload.TrxId,
+			OrderID:  payload.OrderId,
 			GrossAmt: int64(payload.Amount),
 		},
 		CustomerDetail: &midtrans.CustomerDetails{

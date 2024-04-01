@@ -163,7 +163,7 @@ CREATE TABLE installment_transactions (
 
 CREATE TABLE installment_transaction_details (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  loan_id UUID UNIQUE,
+  loan_id UUID,
   installment_amount INT,
   payment_method VARCHAR(100),
   trx_id UUID UNIQUE,
