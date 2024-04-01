@@ -68,4 +68,6 @@ WHERE
 
 	GetAllUser = `SELECT id, username, email, role, status, credit_score, balance, loan_active, created_at, updated_at
 	FROM users`
+
+	UpdateBalance = `UPDATE users SET balance = balance - $1 WHERE id = $2 RETURNING balance`
 )

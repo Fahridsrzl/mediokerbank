@@ -18,6 +18,7 @@ type UserRepository interface {
 	GetUserByID(id string) (model.User, error)
 	DeleteUser(id string) (model.User, error)
 	GetAllUsers() ([]dto.UserDto, error)
+	UpdateBalance(id string, amount int) (int, error)
 }
 
 type userRepository struct {
@@ -288,6 +289,15 @@ func (u *userRepository) GetAllUsers() ([]dto.UserDto, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (u *userRepository) UpdateBalance(id string, amount int) (int, error) {
+	var newBalance int
+	err := u.db.QueryRow(rawquery.UpdateBalance, amount, id).Scan(&newBalance)
+	if err != nil {
+		return 0, err
+	}
+	return newBalance, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

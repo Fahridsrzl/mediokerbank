@@ -14,6 +14,7 @@ type UserUseCase interface {
 	GetUserByID(id string) (model.User, error)
 	RemoveUser(id string) (model.User, error)
 	GetAllUser() ([]dto.UserDto, error)
+	UpdateUserBalance(id string, amount int) (int, error)
 }
 
 type userUseCase struct {
@@ -115,6 +116,14 @@ func (u *userUseCase) GetAllUser() ([]dto.UserDto, error) {
 		return nil, fmt.Errorf("there is no user")
 	}
 	return users, nil
+}
+
+func (u *userUseCase) UpdateUserBalance(id string, amount int) (int, error) {
+	newBalance, err := u.repo.UpdateBalance(id, amount)
+	if err != nil {
+		return 0, err
+	}
+	return newBalance, nil
 }
 
 func NewUserUseCase(repo repository.UserRepository) UserUseCase {
