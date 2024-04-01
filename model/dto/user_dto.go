@@ -1,27 +1,5 @@
 package dto
 
-<<<<<<< HEAD
-// contoh createprofile by id
-// photo, idcard, salaryslip diisi setelah generate pathfile
-// type ProfileCreateDto struct {
-// 	FirstName         "binding required"
-// 	LastName          "binding required"
-// 	Citizenship       "binding required"
-// 	NationalId        "binding required"
-// 	BirthPlace        "binding required"
-// 	BirthDate         string "binding required"
-// 	Gender            "binding required"
-// 	MaritalStatus     "binding required"
-// 	Occupation        "binding required"
-// 	MonthlyIncome     "binding required"
-// 	PhoneNumber       string "binding required"
-// 	UrgentPhoneNumber string "binding required"
-// 	Photo             string "pathfile"
-// 	IdCard            string "pathfile"
-// 	SalarySlip        string "pathfile"
-// 	UserId            string "binding required"
-// }
-=======
 import "time"
 
 type ProfileCreateDto struct {
@@ -42,7 +20,6 @@ type ProfileCreateDto struct {
 	SalarySlip        string `json:"salarySlip"`
 	UserID            string `json:"userID"`
 }
->>>>>>> users
 
 type AddressCreateDto struct {
 	AddressLine string `json:"addressLine"`
