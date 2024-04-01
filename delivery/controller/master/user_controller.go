@@ -1,11 +1,18 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
+	"math/rand"
 	appconfig "medioker-bank/config/app_config"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/master"
 	"medioker-bank/utils/common"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,17 +23,69 @@ type UserController struct {
 }
 
 func (u *UserController) createHandler(ctx *gin.Context) {
-	var inputData struct {
-		ProfileDto dto.ProfileCreateDto `json:"profileDto"`
-		AddressDto dto.AddressCreateDto `json:"addressDto"`
-	}
-	if err := ctx.ShouldBindJSON(&inputData); err != nil {
+	profile := ctx.PostForm("profile")
+	address := ctx.PostForm("address")
+
+	filePhoto, headerPhoto, err := ctx.Request.FormFile("photo")
+	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+	defer filePhoto.Close()
+
+	fileIdCard, headerIdCard, err := ctx.Request.FormFile("idCard")
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	defer fileIdCard.Close()
+
+	fileSalarySlip, headerSalarySlip, err := ctx.Request.FormFile("salarySlip")
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	defer fileSalarySlip.Close()
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano())).Int() / 1e13
+	photoName := fmt.Sprintf("photo_%v%s", random, filepath.Ext(headerPhoto.Filename))
+	idCardName := fmt.Sprintf("id_%v%s", random, filepath.Ext(headerIdCard.Filename))
+	salarySlipName := fmt.Sprintf("salary_%v%s", random, filepath.Ext(headerSalarySlip.Filename))
+	randomString := strconv.Itoa(random)
+	fileLocation := filepath.Join("uploads", "file_["+randomString+"]")
+	photoLocation := filepath.Join(fileLocation, photoName)
+	idCardLocation := filepath.Join(fileLocation, idCardName)
+	salarySlipLocation := filepath.Join(fileLocation, salarySlipName)
+
+	os.MkdirAll(filepath.Dir(photoLocation), os.ModePerm)
+	os.MkdirAll(filepath.Dir(idCardLocation), os.ModePerm)
+	os.MkdirAll(filepath.Dir(salarySlipLocation), os.ModePerm)
+
+	if err := ctx.SaveUploadedFile(headerPhoto, photoLocation); err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if err := ctx.SaveUploadedFile(headerIdCard, idCardLocation); err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if err := ctx.SaveUploadedFile(headerSalarySlip, salarySlipLocation); err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var profileDto dto.ProfileCreateDto
+	var addressDto dto.AddressCreateDto
+
+	json.Unmarshal([]byte(profile), &profileDto)
+	json.Unmarshal([]byte(address), &addressDto)
+
+	profileDto.Photo = photoLocation
+	profileDto.IDCard = idCardLocation
+	profileDto.SalarySlip = salarySlipLocation
 
 	// Call use case to create user, profile, and address
-	_, _, _, err := u.uc.CreateProfileAndAddressThenUpdateUser(inputData.ProfileDto, inputData.AddressDto)
+	_, _, _, err = u.uc.CreateProfileAndAddressThenUpdateUser(profileDto, addressDto)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
