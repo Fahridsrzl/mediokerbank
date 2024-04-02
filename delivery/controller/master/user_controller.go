@@ -85,7 +85,7 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 	profileDto.SalarySlip = salarySlipLocation
 
 	// Call use case to create user, profile, and address
-	_, _, _, err = u.uc.CreateProfileAndAddressThenUpdateUser(profileDto, addressDto)
+	_, _, err = u.uc.CreateProfileAndAddressThenUpdateUser(profileDto, addressDto)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -112,11 +112,13 @@ func (e *UserController) getStatusHandler(ctx *gin.Context) {
 func (e *UserController) updateHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	response, err := e.uc.UpdateStatus(id)
+	err := e.uc.UpdateStatus(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	response := "success verifying user with id: " + id
 
 	common.SendSingleResponse(ctx, "ok", response)
 }
@@ -136,11 +138,13 @@ func (e *UserController) getIdHandler(ctx *gin.Context) {
 func (e *UserController) deletehandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	response, err := e.uc.RemoveUser(id)
+	_, err := e.uc.RemoveUser(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	response := "success delete user with id: " + id
 
 	common.SendSingleResponse(ctx, "delete", response)
 }
@@ -153,7 +157,7 @@ func (u *UserController) getAllUserHandler(ctx *gin.Context) {
 	}
 
 	// Set response headers and send JSON data
-	ctx.JSON(http.StatusOK, users)
+	common.SendSingleResponse(ctx, "ok", users)
 }
 
 func (u *UserController) Router() {

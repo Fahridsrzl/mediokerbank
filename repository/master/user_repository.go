@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	UpdateUser(payload model.User) (model.User, error)
+	UpdateUser(payload model.User) error
 	CreateProfile(payload model.Profile) (model.Profile, error)
 	CreateAddress(payload model.Address, profileID model.Profile) (model.Address, error)
 	GetUserByStatus(status string) ([]dto.ResponseStatus, error)
@@ -132,28 +132,27 @@ func (u *userRepository) CreateAddress(payload model.Address, profileID model.Pr
 	return address, nil
 }
 
-func (u *userRepository) UpdateUser(payload model.User) (model.User, error) {
+func (u *userRepository) UpdateUser(payload model.User) error {
 	tx, err := u.db.Begin()
 	if err != nil {
-		return model.User{}, err
+		return err
 	}
 
-	var user model.User
 	_, err = tx.Exec(rawquery.UpdateUser,
 		payload.Status, // Update status field
 		payload.ID,     // Where condition based on user ID
 	)
 	if err != nil {
 		tx.Rollback()
-		return model.User{}, errors.New("update user :" + err.Error())
+		return errors.New("update user :" + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return model.User{}, err
+		return err
 	}
 
-	return user, nil
+	return nil
 }
 
 func (u *userRepository) GetUserByStatus(status string) ([]dto.ResponseStatus, error) {
