@@ -52,3 +52,4 @@ time="2024-04-02T13:36:04+07:00" level=info msg="{2024-04-02 13:36:04.7112223 +0
 time="2024-04-02T13:36:06+07:00" level=info msg="{2024-04-02 13:36:05.7223421 +0700 +07 m=+76.014238401 359.1095ms ::1 POST 200 /api/v1/transactions/installments/ PostmanRuntime/7.37.0}"
 time="2024-04-02T13:36:07+07:00" level=info msg="{2024-04-02 13:36:06.9484244 +0700 +07 m=+77.240320701 161.4137ms ::1 POST 200 /api/v1/transactions/installments/ PostmanRuntime/7.37.0}"
 time="2024-04-02T13:36:08+07:00" level=info msg="{2024-04-02 13:36:08.163004 +0700 +07 m=+78.454900301 175.0002ms ::1 POST 200 /api/v1/transactions/installments/ PostmanRuntime/7.37.0}"
+
