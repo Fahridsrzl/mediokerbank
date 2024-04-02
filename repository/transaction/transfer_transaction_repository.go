@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
@@ -21,7 +22,11 @@ type transferRepository struct {
 
 func (t *transferRepository) CreateTransfer(payload model.TransferTransaction) (model.TransferTransaction, error) {
 	var topup model.TransferTransaction
-	err := t.db.QueryRow(rawquery.CreateTransfer,
+	tx, err := t.db.Begin()
+	if err != nil {
+		return model.TransferTransaction{}, err
+	}
+	err = tx.QueryRow(rawquery.CreateTransfer,
 		time.Now(),
 		payload.SenderID,
 		payload.ReceiverID,
@@ -40,7 +45,22 @@ func (t *transferRepository) CreateTransfer(payload model.TransferTransaction) (
 		&topup.UpdatedAt,
 	)
 	if err != nil {
-		return model.TransferTransaction{}, err
+		tx.Rollback()
+		return model.TransferTransaction{}, errors.New("create trx: " + err.Error())
+	}
+	_, err = tx.Exec(rawquery.UpdateSenderBalance, payload.Amount, payload.SenderID)
+	if err != nil {
+		tx.Rollback()
+		return model.TransferTransaction{}, errors.New("sender balance: " + err.Error())
+	}
+	_, err = tx.Exec(rawquery.UpdateReceiverBalance, payload.Amount, payload.ReceiverID)
+	if err != nil {
+		tx.Rollback()
+		return model.TransferTransaction{}, errors.New("receiver balance: " + err.Error())
+	}
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
+		return model.TransferTransaction{}, errors.New("commit: " + err.Error())
 	}
 	return topup, nil
 }
