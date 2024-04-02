@@ -43,3 +43,4 @@ time="2024-04-02T09:55:59+07:00" level=info msg="{2024-04-02 09:55:59.1428514 +0
 time="2024-04-02T09:56:24+07:00" level=info msg="{2024-04-02 09:56:24.2250704 +0700 +07 m=+38.686135201 172.5116ms ::1 GET 200 /api/v1/transactions/installments/users/f2f44164-0e1b-4e63-ba2d-af6d189511b7/54adedf4-2966-4173-be28-902f5ed0f6c4 PostmanRuntime/7.37.0}"
 time="2024-04-02T09:56:49+07:00" level=info msg="{2024-04-02 09:56:49.178513 +0700 +07 m=+63.639577801 54.7009ms ::1 GET 200 /api/v1/transactions/installments/users/f2f44164-0e1b-4e63-ba2d-af6d189511b7 PostmanRuntime/7.37.0}"
 time="2024-04-02T09:57:22+07:00" level=info msg="{2024-04-02 09:57:22.7602052 +0700 +07 m=+97.221270001 4.3689ms ::1 GET 200 /api/v1/transactions/installments/users/f2f44164-0e1b-4e63-ba2d-af6d189511b7 PostmanRuntime/7.37.0}"
+time="2024-04-02T10:29:55+07:00" level=info msg="{2024-04-02 10:29:55.5230864 +0700 +07 m=+54.493120301 117.7777ms ::1 GET 200 /api/v1/users/ PostmanRuntime/7.37.0}"
