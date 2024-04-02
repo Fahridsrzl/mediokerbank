@@ -25,7 +25,7 @@ func (u *useCaseManager) UserUseCase() master.UserUseCase {
 }
 
 func (u *useCaseManager) TopupUseCase() transaction.TopupUseCase {
-	return transaction.NewTopupTransactionUseCase(u.repo.TopupRepo())
+	return transaction.NewTopupTransactionUseCase(u.repo.TopupRepo(), u.UserUseCase())
 }
 
 func (u *useCaseManager) TransferUseCase() transaction.TransferUseCase {

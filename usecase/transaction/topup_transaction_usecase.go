@@ -66,6 +66,6 @@ func (u *topupUseCase) GetAllTopUp() ([]dto.ResponseTopUp, error) {
 	return topups, nil
 }
 
-func NewTopupTransactionUseCase(repo repository.TopupRepository) TopupUseCase {
-	return &topupUseCase{repo: repo}
+func NewTopupTransactionUseCase(repo repository.TopupRepository, userUc usecase.UserUseCase) TopupUseCase {
+	return &topupUseCase{repo: repo, userUc: userUc}
 }
