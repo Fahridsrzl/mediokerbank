@@ -6,7 +6,6 @@ import (
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
-	"time"
 )
 
 type InstallmentTransactionRepository interface {
@@ -30,26 +29,12 @@ func (i *installmentTransactionRepository) Create(payload model.InstallmentTrans
 	if err != nil {
 		return model.InstallmentTransaction{}, err
 	}
-	var status string
-	var id string
-	var timestamp time.Time
-	_ = i.db.QueryRow(rawquery.FindStatusByLoanId, payload.TrxDetail.Loan.Id, "pending").Scan(&status, &id, &timestamp)
-	if status == "pending" {
-		if int64(timestamp.Add(30*time.Minute).Unix()) < int64(time.Now().Unix()) {
-			_, err := tx.Exec(rawquery.UpdateInstallmentById, "expired", id)
-			if err != nil {
-				tx.Rollback()
-				return model.InstallmentTransaction{}, err
-			}
-		}
-		return model.InstallmentTransaction{}, errors.New("previous payment bill is still active, can't make a new bill payment")
-	}
 	err = tx.QueryRow(rawquery.CreateInstallment, payload.UserId, payload.Status).Scan(
 		&trx.Id, &trx.TrxDate, &trx.UserId, &trx.Status, &trx.CreatedAt, &trx.UpdatedAt,
 	)
 	if err != nil {
 		tx.Rollback()
-		return model.InstallmentTransaction{}, errors.New("installment: " + err.Error())
+		return model.InstallmentTransaction{}, errors.New("trxdetail:" + err.Error())
 	}
 	payloadTrxd := payload.TrxDetail
 	err = tx.QueryRow(rawquery.CreateInstallmentDetail, payloadTrxd.Loan.Id, payloadTrxd.InstallmentAmount, payloadTrxd.PaymentMethod, trx.Id).Scan(

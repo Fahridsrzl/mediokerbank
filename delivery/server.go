@@ -31,18 +31,14 @@ func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	// authMiddleware := middleware.NewAuthMiddleware(s.jwt)
 	rg := s.engine.Group("/api/v1")
-<<<<<<< HEAD
+
 	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
 	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()
 	cOther.NewAuthController(s.auth, rg, s.jwt).Router()
 	cTransaction.NewInstallmentTransactionController(s.installmentTrx, rg).Router()
 	cTransaction.NewTopupController(s.uc.TopupUseCase(), rg).Router()
 	cTransaction.NewTransferController(s.uc.TransferUseCase(), rg).Router()
-=======
-	controller.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
-	controller.NewLoanTransactionController(s.uc.LoanTransactionUseCase(), rg).Router()
-	controller.NewUserController(s.uc.UserUseCase(), rg).Router()
->>>>>>> aa61765cc1092d348ad9c655dd82aecc9f852623
+	cTransaction.NewLoanTransactionController(s.uc.LoanTransactionUseCase(), rg).Router()
 }
 
 func (s *Server) Run() {

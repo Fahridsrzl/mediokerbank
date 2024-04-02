@@ -42,6 +42,9 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 	if err != nil {
 		return dto.InstallmentTransactionResponseDto{}, err
 	}
+	if len(loans) == 0 {
+		return dto.InstallmentTransactionResponseDto{}, errors.New("loan id not found")
+	}
 	var loan model.Loan
 	for _, item := range loans {
 		if item.Id != payload.LoanId {
@@ -80,9 +83,9 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		if err != nil {
 			return dto.InstallmentTransactionResponseDto{}, err
 		}
-		err = i.loan.UpdatePeriod(trxRes.TrxDetail.Loan.Id)
+		err = i.loan.UpdatePeriod(trxReq.TrxDetail.Loan.Id)
 		if err != nil {
-			delErr := i.repo.DeleteById(trxReq.Id)
+			delErr := i.repo.DeleteById(trxRes.Id)
 			if delErr != nil {
 				return dto.InstallmentTransactionResponseDto{}, errors.New("[1]" + err.Error() + " [2]" + delErr.Error())
 			}
