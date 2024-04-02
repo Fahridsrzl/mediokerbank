@@ -6,7 +6,6 @@ type TransferDto struct {
 	SenderID   string `json:"senderId"`
 	ReceiverID string `json:"receiverId"`
 	Amount     int    `json:"amount"`
-	Status     string `json:"status"`
 }
 
 type ResponseTransfer struct {

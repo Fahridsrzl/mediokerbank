@@ -29,7 +29,7 @@ func (u *useCaseManager) TopupUseCase() transaction.TopupUseCase {
 }
 
 func (u *useCaseManager) TransferUseCase() transaction.TransferUseCase {
-	return transaction.NewTransferTransactionUseCase(u.repo.TransferRepo())
+	return transaction.NewTransferTransactionUseCase(u.repo.TransferRepo(), u.UserUseCase())
 }
 
 func NewUseCaseManager(repo RepoManager) UseCaseManager {

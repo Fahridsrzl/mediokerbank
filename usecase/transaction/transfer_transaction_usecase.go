@@ -6,6 +6,7 @@ import (
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	repository "medioker-bank/repository/transaction"
+	usecase "medioker-bank/usecase/master"
 )
 
 type TransferUseCase interface {
@@ -16,15 +17,30 @@ type TransferUseCase interface {
 }
 
 type transferUseCase struct {
-	repo repository.TransferRepository
+	repo   repository.TransferRepository
+	userUc usecase.UserUseCase
 }
 
 func (u *transferUseCase) CreateTransfer(transferDto dto.TransferDto) (model.TransferTransaction, error) {
+	sender, err := u.userUc.GetUserByID(transferDto.SenderID)
+	if err != nil {
+		return model.TransferTransaction{}, errors.New("find sender: " + err.Error())
+	}
+	receiver, err := u.userUc.GetUserByID(transferDto.ReceiverID)
+	if err != nil {
+		return model.TransferTransaction{}, errors.New("find receiver: " + err.Error())
+	}
+	if sender.Status != "verified" || receiver.Status != "verified" {
+		return model.TransferTransaction{}, errors.New("sender or receiver unverified")
+	}
+	if sender.Balance < transferDto.Amount {
+		return model.TransferTransaction{}, errors.New("too low sender balance")
+	}
 	transfer := model.TransferTransaction{
 		SenderID:   transferDto.SenderID,
 		ReceiverID: transferDto.ReceiverID,
 		Amount:     transferDto.Amount,
-		Status:     transferDto.Status,
+		Status:     "success",
 	}
 
 	createdTransfer, err := u.repo.CreateTransfer(transfer)
@@ -58,6 +74,6 @@ func (u *transferUseCase) GetAllTransfer() ([]dto.ResponseTransfer, error) {
 	return transfers, nil
 }
 
-func NewTransferTransactionUseCase(repo repository.TransferRepository) TransferUseCase {
-	return &transferUseCase{repo: repo}
+func NewTransferTransactionUseCase(repo repository.TransferRepository, userUc usecase.UserUseCase) TransferUseCase {
+	return &transferUseCase{repo: repo, userUc: userUc}
 }
