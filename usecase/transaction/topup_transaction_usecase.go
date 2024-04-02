@@ -22,7 +22,7 @@ type topupUseCase struct {
 }
 
 func (u *topupUseCase) CreateTopup(topupDto dto.TopupDto) (model.TopupTransaction, error) {
-	user, err := u.userUc.GetUserByID(topupDto.UserID)
+	user,_, err := u.userUc.GetUserByID(topupDto.UserID)
 	if err != nil {
 		return model.TopupTransaction{}, errors.New("find user: " + err.Error())
 	}

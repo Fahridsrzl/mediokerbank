@@ -22,11 +22,11 @@ type transferUseCase struct {
 }
 
 func (u *transferUseCase) CreateTransfer(transferDto dto.TransferDto) (model.TransferTransaction, error) {
-	sender, err := u.userUc.GetUserByID(transferDto.SenderID)
+	sender,_, err := u.userUc.GetUserByID(transferDto.SenderID)
 	if err != nil {
 		return model.TransferTransaction{}, errors.New("find sender: " + err.Error())
 	}
-	receiver, err := u.userUc.GetUserByID(transferDto.ReceiverID)
+	receiver,_, err := u.userUc.GetUserByID(transferDto.ReceiverID)
 	if err != nil {
 		return model.TransferTransaction{}, errors.New("find receiver: " + err.Error())
 	}
