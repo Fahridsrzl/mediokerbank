@@ -1,5 +1,5 @@
 .env
-.log
+logger.log
 go.sum
 note.txt
 repo.txt

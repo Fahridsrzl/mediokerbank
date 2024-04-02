@@ -10,7 +10,7 @@ type LoanProductRepository interface {
 	GetById(id string) (model.LoanProduct, error)
 	GetAll() ([]model.LoanProduct, error)
 	Create(payload model.LoanProduct) (model.LoanProduct, error)
-	Update(id string, payload model.LoanProduct) (model.LoanProduct, error)
+	Update(id string, payload model.LoanProduct) error
 	Delete(id string) (model.LoanProduct, error)
 }
 
@@ -76,7 +76,7 @@ func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
 func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanProduct, error) {
 	var createdLoanProduct model.LoanProduct
 	err := l.db.QueryRow(rawquery.CreateLoanProduct,
-		payload.Name, payload.MaxAmount, payload.InstallmentPeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome).
+		payload.Name, payload.MaxAmount, payload.MinInstallmentPeriod, payload.MaxInstallmentPeriod, payload.InstallmentPeriodUnit, payload.AdminFee, payload.MinCreditScore, payload.MinMonthlyIncome).
 		Scan(
 			&createdLoanProduct.Id,
 			&createdLoanProduct.Name,
@@ -96,14 +96,13 @@ func (l *loanProductRepository) Create(payload model.LoanProduct) (model.LoanPro
 	return createdLoanProduct, nil
 }
 
-func (l *loanProductRepository) Update(id string, payload model.LoanProduct) (model.LoanProduct, error) {
-	var loanProduct model.LoanProduct
+func (l *loanProductRepository) Update(id string, payload model.LoanProduct) error {
 	_, err := l.db.Exec(rawquery.UpdateLoanProductById,
-		payload.Name, payload.MaxAmount, payload.InstallmentPeriodUnit, payload.MinCreditScore, payload.MinMonthlyIncome, id)
+		payload.Name, payload.MaxAmount, payload.MinInstallmentPeriod, payload.MaxInstallmentPeriod, payload.InstallmentPeriodUnit, payload.AdminFee, payload.MinCreditScore, payload.MinMonthlyIncome, id)
 	if err != nil {
-		return model.LoanProduct{}, err
+		return err
 	}
-	return loanProduct, nil
+	return nil
 }
 
 func (l *loanProductRepository) Delete(id string) (model.LoanProduct, error) {

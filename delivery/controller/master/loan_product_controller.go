@@ -63,11 +63,12 @@ func (l *LoanProductController) UpdateHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-	response, err := l.ul.UpdateLoanProduct(id, payload)
+	err = l.ul.UpdateLoanProduct(id, payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+	response := "success update loan_products with id: " + id
 	common.SendSingleResponse(ctx, "Updated successfully", response)
 }
 
@@ -78,10 +79,12 @@ func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 		return
 	}
 
-	response, err := l.ul.DeleteLoanProduct(id); if err != nil {
+	_, err := l.ul.DeleteLoanProduct(id)
+	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+	response := "success delete loan_products with id: " + id
 	common.SendSingleResponse(ctx, "Deleted successfully", response)
 }
 
@@ -95,7 +98,6 @@ func (l *LoanProductController) Router() {
 		spc.DELETE(appconfig.LoanProductDelete, l.DeleteHandler)
 	}
 }
-
 
 func NewLoanProductController(ul usecase.LoanProductUseCase, rg *gin.RouterGroup) *LoanProductController {
 	return &LoanProductController{ul: ul, rg: rg}

@@ -9,7 +9,7 @@ type LoanProductUseCase interface {
 	FindLoanProductById(id string) (model.LoanProduct, error)
 	FindAllLoanProduct() ([]model.LoanProduct, error)
 	CreateLoanProduct(payload model.LoanProduct) (model.LoanProduct, error)
-	UpdateLoanProduct(id string, payload model.LoanProduct) (model.LoanProduct, error)
+	UpdateLoanProduct(id string, payload model.LoanProduct) error
 	DeleteLoanProduct(id string) (model.LoanProduct, error)
 }
 
@@ -43,16 +43,16 @@ func (l *loanProductUseCase) CreateLoanProduct(payload model.LoanProduct) (model
 	return createdLoanProduct, nil
 }
 
-func (l *loanProductUseCase) UpdateLoanProduct(id string, payload model.LoanProduct) (model.LoanProduct, error) {
-	loanProduct,err := l.repo.Update(id, payload)
+func (l *loanProductUseCase) UpdateLoanProduct(id string, payload model.LoanProduct) error {
+	err := l.repo.Update(id, payload)
 	if err != nil {
-		return model.LoanProduct{},err
+		return err
 	}
-	return loanProduct, nil
+	return nil
 }
 
 func (l *loanProductUseCase) DeleteLoanProduct(id string) (model.LoanProduct, error) {
-	loanProduct,err := l.repo.Delete(id)
+	loanProduct, err := l.repo.Delete(id)
 	if err != nil {
 		return model.LoanProduct{}, err
 	}
