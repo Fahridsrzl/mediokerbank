@@ -2,6 +2,7 @@ package controller
 
 import (
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/delivery/middleware"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/transaction"
 	"medioker-bank/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type TopupController struct {
-	tc usecase.TopupUseCase
-	rg *gin.RouterGroup
+	tc  usecase.TopupUseCase
+	rg  *gin.RouterGroup
+	jwt middleware.AuthMiddleware
 }
 
 func (t *TopupController) createHandler(ctx *gin.Context) {
@@ -67,12 +69,14 @@ func (u *TopupController) getAllTopupHandler(ctx *gin.Context) {
 
 func (t *TopupController) Router() {
 	ur := t.rg.Group(appconfig.TopupGroup)
-	ur.POST(appconfig.Topup, t.createHandler)
-	ur.GET(appconfig.Topup, t.getAllTopupHandler)
-	ur.GET(appconfig.TopupId, t.getTopupIdHandler)
-	ur.GET(appconfig.TopupUser, t.getTopupUserIdHandler)
+	{
+		ur.POST(appconfig.Topup, t.jwt.RequireToken("user"), t.createHandler)
+		ur.GET(appconfig.Topup, t.jwt.RequireToken("admin"), t.getAllTopupHandler)
+		ur.GET(appconfig.TopupId, t.jwt.RequireToken("admin"), t.getTopupIdHandler)
+		ur.GET(appconfig.TopupUser, t.jwt.RequireToken("user"), t.getTopupUserIdHandler)
+	}
 }
 
-func NewTopupController(tc usecase.TopupUseCase, rg *gin.RouterGroup) *TopupController {
-	return &TopupController{tc: tc, rg: rg}
+func NewTopupController(tc usecase.TopupUseCase, rg *gin.RouterGroup, jwt middleware.AuthMiddleware) *TopupController {
+	return &TopupController{tc: tc, rg: rg, jwt: jwt}
 }

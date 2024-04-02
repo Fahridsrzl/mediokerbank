@@ -2,6 +2,7 @@ package controller
 
 import (
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/delivery/middleware"
 	"medioker-bank/model/dto"
 	transaction "medioker-bank/usecase/transaction"
 	"medioker-bank/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type LoanTransactionController struct {
-	rg *gin.RouterGroup
-	ul transaction.LoanTransactionUseCase
+	rg  *gin.RouterGroup
+	ul  transaction.LoanTransactionUseCase
+	jwt middleware.AuthMiddleware
 }
 
 func (l *LoanTransactionController) GetLoanTransacttionByUserIdAndTrxId(ctx *gin.Context) {
@@ -91,13 +93,15 @@ func (l *LoanTransactionController) GetHandlerById(ctx *gin.Context) {
 
 func (l *LoanTransactionController) Router() {
 	br := l.rg.Group(appconfig.LoanTransactionGroup)
-	br.POST(appconfig.LoanTransactionCreate, l.createHandler)
-	br.GET(appconfig.LoanTransactionFindById, l.GetHandlerById)
-	br.GET(appconfig.LoanTransactionFindByUserId, l.GetHandlerByUserId)
-	br.GET(appconfig.LoanTransactionFindAll, l.GetAllHandler)
-	br.GET(appconfig.LoanTransactionFindByUserIdAndTrxId, l.GetLoanTransacttionByUserIdAndTrxId)
+	{
+		br.POST(appconfig.LoanTransactionCreate, l.jwt.RequireToken("user"), l.createHandler)
+		br.GET(appconfig.LoanTransactionFindById, l.jwt.RequireToken("admin"), l.GetHandlerById)
+		br.GET(appconfig.LoanTransactionFindByUserId, l.jwt.RequireToken("user"), l.GetHandlerByUserId)
+		br.GET(appconfig.LoanTransactionFindAll, l.jwt.RequireToken("admin"), l.GetAllHandler)
+		br.GET(appconfig.LoanTransactionFindByUserIdAndTrxId, l.jwt.RequireToken("user"), l.GetLoanTransacttionByUserIdAndTrxId)
+	}
 }
 
-func NewLoanTransactionController(ul transaction.LoanTransactionUseCase, rg *gin.RouterGroup) *LoanTransactionController {
-	return &LoanTransactionController{ul: ul, rg: rg}
+func NewLoanTransactionController(ul transaction.LoanTransactionUseCase, rg *gin.RouterGroup, jwt middleware.AuthMiddleware) *LoanTransactionController {
+	return &LoanTransactionController{ul: ul, rg: rg, jwt: jwt}
 }

@@ -29,7 +29,6 @@ CREATE TABLE users (
   status VARCHAR(100),
   credit_score INT,
   balance INT,
-  loan_active INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

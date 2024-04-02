@@ -2,6 +2,7 @@ package controller
 
 import (
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/delivery/middleware"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/transaction"
 	"medioker-bank/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type InstallmentTransactionController struct {
-	uc usecase.InstallmentTransactionUseCase
-	rg *gin.RouterGroup
+	uc  usecase.InstallmentTransactionUseCase
+	rg  *gin.RouterGroup
+	jwt middleware.AuthMiddleware
 }
 
 func (i *InstallmentTransactionController) createTrxHandler(ctx *gin.Context) {
@@ -89,15 +91,15 @@ func (i *InstallmentTransactionController) midtransHookHandler(ctx *gin.Context)
 func (i *InstallmentTransactionController) Router() {
 	installmentGroup := i.rg.Group(appconfig.InstallmentGroup)
 	{
-		installmentGroup.POST(appconfig.InstallmentCreate, i.createTrxHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxById, i.findTrxByIdHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxMany, i.findTrxManyHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxByUserId, i.findTrxByUserIdHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxByUserAndTrxId, i.findTrxByUserIdAndTrxIdHandler)
+		installmentGroup.POST(appconfig.InstallmentCreate, i.jwt.RequireToken("user"), i.createTrxHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxById, i.jwt.RequireToken("admin"), i.findTrxByIdHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxMany, i.jwt.RequireToken("admin"), i.findTrxManyHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxByUserId, i.jwt.RequireToken("user"), i.findTrxByUserIdHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxByUserAndTrxId, i.jwt.RequireToken("user"), i.findTrxByUserIdAndTrxIdHandler)
 		installmentGroup.GET(appconfig.InstallmentMidtransHook, i.midtransHookHandler)
 	}
 }
 
-func NewInstallmentTransactionController(uc usecase.InstallmentTransactionUseCase, rg *gin.RouterGroup) *InstallmentTransactionController {
-	return &InstallmentTransactionController{uc: uc, rg: rg}
+func NewInstallmentTransactionController(uc usecase.InstallmentTransactionUseCase, rg *gin.RouterGroup, jwt middleware.AuthMiddleware) *InstallmentTransactionController {
+	return &InstallmentTransactionController{uc: uc, rg: rg, jwt: jwt}
 }

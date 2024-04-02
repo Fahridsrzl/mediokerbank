@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/delivery/middleware"
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/master"
@@ -19,8 +20,9 @@ import (
 )
 
 type UserController struct {
-	uc usecase.UserUseCase
-	rg *gin.RouterGroup
+	uc  usecase.UserUseCase
+	rg  *gin.RouterGroup
+	jwt middleware.AuthMiddleware
 }
 
 func (u *UserController) createHandler(ctx *gin.Context) {
@@ -133,6 +135,15 @@ func (u *UserController) getidHandler(ctx *gin.Context) {
 		return
 	}
 
+	role := ctx.MustGet("role")
+	userId := ctx.MustGet("id")
+	if role == "user" {
+		if userId != user.ID {
+			common.SendErrorResponse(ctx, http.StatusForbidden, "forbidden action")
+			return
+		}
+	}
+
 	response := struct {
 		User  model.User   `json:"user"`
 		Loans []model.Loan `json:"loans"`
@@ -171,14 +182,16 @@ func (u *UserController) getAllUserHandler(ctx *gin.Context) {
 
 func (u *UserController) Router() {
 	ur := u.rg.Group(appconfig.UserGroup)
-	ur.POST(appconfig.UserAll, u.createHandler)
-	ur.GET(appconfig.UserStatus, u.getStatusHandler)
-	ur.GET(appconfig.UserId, u.getidHandler)
-	ur.GET(appconfig.UserAll, u.getAllUserHandler)
-	ur.PUT(appconfig.UserId, u.updateHandler)
-	ur.DELETE(appconfig.UserId, u.deletehandler)
+	{
+		ur.POST(appconfig.UserAll, u.jwt.RequireToken("user"), u.createHandler)
+		ur.GET(appconfig.UserStatus, u.jwt.RequireToken("admin"), u.getStatusHandler)
+		ur.GET(appconfig.UserId, u.jwt.RequireToken("admin", "user"), u.getidHandler)
+		ur.GET(appconfig.UserAll, u.jwt.RequireToken("admin"), u.getAllUserHandler)
+		ur.PUT(appconfig.UserId, u.jwt.RequireToken("admin"), u.updateHandler)
+		ur.DELETE(appconfig.UserId, u.jwt.RequireToken("admin"), u.deletehandler)
+	}
 }
 
-func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
-	return &UserController{uc: uc, rg: rg}
+func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup, jwt middleware.AuthMiddleware) *UserController {
+	return &UserController{uc: uc, rg: rg, jwt: jwt}
 }

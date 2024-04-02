@@ -59,6 +59,9 @@ func (a *authMiddleware) RequireToken(roles ...string) gin.HandlerFunc {
 			return
 		}
 
+		ctx.Set("role", claims["role"])
+		ctx.Set("id", claims["userId"])
+
 		ctx.Next()
 	}
 }

@@ -13,7 +13,7 @@ const (
 		address_line, city, province, postal_code, country, profile_id, created_at, updated_at
 	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, address_line, city, province, postal_code, country, profile_id, created_at, updated_at`
 
-	GetUserByStatus = `SELECT id,username,email,role, status, credit_score, balance, loan_active,created_at,updated_at FROM users WHERE status = $1`
+	GetUserByStatus = `SELECT id,username,email,role, status, credit_score, balance,created_at,updated_at FROM users WHERE status = $1`
 
 	GetUserById = `SELECT
     u.id,
@@ -24,7 +24,6 @@ const (
     u.status,
     u.credit_score,
     u.balance,
-    u.loan_active,
     u.created_at,
     u.updated_at,
     p.id,
@@ -66,7 +65,7 @@ WHERE
 
 	DeleteUser = `DELETE FROM users WHERE id = $1`
 
-	GetAllUser = `SELECT id, username, email, role, status, credit_score, balance, loan_active, created_at, updated_at
+	GetAllUser = `SELECT id, username, email, role, status, credit_score, balance, created_at, updated_at
 	FROM users`
 
 	UpdateBalance = `UPDATE users SET balance = balance - $1 WHERE id = $2 RETURNING balance`

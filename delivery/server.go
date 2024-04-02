@@ -29,16 +29,16 @@ type Server struct {
 
 func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
-	// authMiddleware := middleware.NewAuthMiddleware(s.jwt)
+	authMiddleware := middleware.NewAuthMiddleware(s.jwt)
 	rg := s.engine.Group("/api/v1")
 
-	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg).Router()
-	cMaster.NewUserController(s.uc.UserUseCase(), rg).Router()
+	cMaster.NewLoanProductController(s.uc.LoanProductUseCase(), rg, authMiddleware).Router()
+	cMaster.NewUserController(s.uc.UserUseCase(), rg, authMiddleware).Router()
 	cOther.NewAuthController(s.auth, rg, s.jwt).Router()
-	cTransaction.NewInstallmentTransactionController(s.installmentTrx, rg).Router()
-	cTransaction.NewTopupController(s.uc.TopupUseCase(), rg).Router()
-	cTransaction.NewTransferController(s.uc.TransferUseCase(), rg).Router()
-	cTransaction.NewLoanTransactionController(s.uc.LoanTransactionUseCase(), rg).Router()
+	cTransaction.NewInstallmentTransactionController(s.installmentTrx, rg, authMiddleware).Router()
+	cTransaction.NewTopupController(s.uc.TopupUseCase(), rg, authMiddleware).Router()
+	cTransaction.NewTransferController(s.uc.TransferUseCase(), rg, authMiddleware).Router()
+	cTransaction.NewLoanTransactionController(s.uc.LoanTransactionUseCase(), rg, authMiddleware).Router()
 }
 
 func (s *Server) Run() {

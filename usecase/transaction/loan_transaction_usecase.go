@@ -62,7 +62,7 @@ func (l *loanTransactionUseCase) FindById(id string) (model.LoanTransaction, err
 
 func (l *loanTransactionUseCase) RegisterNewTransaction(payload dto.LoanTransactionRequestDto) (model.LoanTransaction, error) {
 	fmt.Println("bills log: ", payload)
-	user, err := l.userUC.GetUserByID(payload.UserId)
+	user, _, err := l.userUC.GetUserByID(payload.UserId)
 	if err != nil {
 		return model.LoanTransaction{}, err
 	}

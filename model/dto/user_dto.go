@@ -38,7 +38,6 @@ type ResponseStatus struct {
 	Status      string    `json:"status"`
 	CreditScore int       `json:"creditScore"`
 	Balance     int       `json:"balance"`
-	LoanActive  int       `json:"loanActive"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
@@ -52,7 +51,6 @@ type UserDto struct {
 	Status      string    `json:"status"`
 	CreditScore int       `json:"creditScore"`
 	Balance     int       `json:"balance"`
-	LoanActive  int       `json:"loanActive"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }

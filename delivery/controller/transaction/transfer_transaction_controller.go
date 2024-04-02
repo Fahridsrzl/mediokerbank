@@ -2,6 +2,7 @@ package controller
 
 import (
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/delivery/middleware"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/transaction"
 	"medioker-bank/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type TransferController struct {
-	tc usecase.TransferUseCase
-	rg *gin.RouterGroup
+	tc  usecase.TransferUseCase
+	rg  *gin.RouterGroup
+	jwt middleware.AuthMiddleware
 }
 
 func (t *TransferController) createHandler(ctx *gin.Context) {
@@ -67,12 +69,14 @@ func (u *TransferController) getAllTransferHandler(ctx *gin.Context) {
 
 func (t *TransferController) Router() {
 	ur := t.rg.Group(appconfig.TransferGroup)
-	ur.POST(appconfig.Transfer, t.createHandler)
-	ur.GET(appconfig.Transfer, t.getAllTransferHandler)
-	ur.GET(appconfig.TransferSenderId, t.getSenderIdHandler)
-	ur.GET(appconfig.TransferId, t.getTransferIdHandler)
+	{
+		ur.POST(appconfig.Transfer, t.jwt.RequireToken("user"), t.createHandler)
+		ur.GET(appconfig.Transfer, t.jwt.RequireToken("admin"), t.getAllTransferHandler)
+		ur.GET(appconfig.TransferSenderId, t.jwt.RequireToken("user"), t.getSenderIdHandler)
+		ur.GET(appconfig.TransferId, t.jwt.RequireToken("user"), t.getTransferIdHandler)
+	}
 }
 
-func NewTransferController(tc usecase.TransferUseCase, rg *gin.RouterGroup) *TransferController {
-	return &TransferController{tc: tc, rg: rg}
+func NewTransferController(tc usecase.TransferUseCase, rg *gin.RouterGroup, jwt middleware.AuthMiddleware) *TransferController {
+	return &TransferController{tc: tc, rg: rg, jwt: jwt}
 }

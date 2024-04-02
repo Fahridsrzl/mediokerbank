@@ -30,8 +30,8 @@ func (a *authRepository) CreateQueue(payload dto.AuthVerifyDto) (string, error) 
 
 func (a *authRepository) CreateUser(payload dto.AuthVerifyDto) (model.User, error) {
 	var user model.User
-	err := a.db.QueryRow(rawquery.RegisterUser, payload.Username, payload.Email, payload.Password, "user", "unverified", 100, 0, 0).Scan(
-		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.Status, &user.CreditScore, &user.Balance, &user.LoanActive, &user.CreatedAt, &user.UpdatedAt,
+	err := a.db.QueryRow(rawquery.RegisterUser, payload.Username, payload.Email, payload.Password, "user", "unverified", 100, 0).Scan(
+		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.Status, &user.CreditScore, &user.Balance, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		return model.User{}, err
@@ -79,7 +79,7 @@ func (a *authRepository) FindUniqueUser(payload dto.AuthLoginDto) (model.User, e
 		args = append(args, payload.Email)
 	}
 	err = stmt.QueryRow(args...).Scan(
-		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.Status, &user.CreditScore, &user.Balance, &user.LoanActive, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.Status, &user.CreditScore, &user.Balance, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		return model.User{}, err

@@ -174,7 +174,6 @@ func (u *userRepository) GetUserByStatus(status string) ([]dto.ResponseStatus, e
 			&user.Status,
 			&user.CreditScore,
 			&user.Balance,
-			&user.LoanActive,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
@@ -205,7 +204,6 @@ func (u *userRepository) GetUserByID(id string) (model.User, error) {
 		&user.Status,
 		&user.CreditScore,
 		&user.Balance,
-		&user.LoanActive,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 		&profile.ID,
@@ -276,7 +274,6 @@ func (u *userRepository) GetAllUsers() ([]dto.UserDto, error) {
 			&user.Status,
 			&user.CreditScore,
 			&user.Balance,
-			&user.LoanActive,
 			&user.CreatedAt,
 			&user.UpdatedAt)
 		if err != nil {

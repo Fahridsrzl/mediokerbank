@@ -2,6 +2,7 @@ package controller
 
 import (
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/delivery/middleware"
 	"medioker-bank/model"
 	usecase "medioker-bank/usecase/master"
 	"medioker-bank/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type LoanProductController struct {
-	rg *gin.RouterGroup
-	ul usecase.LoanProductUseCase
+	rg  *gin.RouterGroup
+	ul  usecase.LoanProductUseCase
+	jwt middleware.AuthMiddleware
 }
 
 func (l *LoanProductController) GetHandlerById(ctx *gin.Context) {
@@ -91,14 +93,14 @@ func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 func (l *LoanProductController) Router() {
 	spc := l.rg.Group(appconfig.LoanProductGroup)
 	{
-		spc.POST(appconfig.LoanProductCreate, l.CreateHandler)
-		spc.GET(appconfig.LoanProductFindByid, l.GetHandlerById)
-		spc.GET(appconfig.LoanProductFindAll, l.GetAllHandler)
-		spc.PUT(appconfig.LoanProductUpdate, l.UpdateHandler)
-		spc.DELETE(appconfig.LoanProductDelete, l.DeleteHandler)
+		spc.POST(appconfig.LoanProductCreate, l.jwt.RequireToken("admin"), l.CreateHandler)
+		spc.GET(appconfig.LoanProductFindByid, l.jwt.RequireToken("admin", "user"), l.GetHandlerById)
+		spc.GET(appconfig.LoanProductFindAll, l.jwt.RequireToken("admin", "user"), l.GetAllHandler)
+		spc.PUT(appconfig.LoanProductUpdate, l.jwt.RequireToken("admin"), l.UpdateHandler)
+		spc.DELETE(appconfig.LoanProductDelete, l.jwt.RequireToken("admin"), l.DeleteHandler)
 	}
 }
 
-func NewLoanProductController(ul usecase.LoanProductUseCase, rg *gin.RouterGroup) *LoanProductController {
-	return &LoanProductController{ul: ul, rg: rg}
+func NewLoanProductController(ul usecase.LoanProductUseCase, rg *gin.RouterGroup, jwt middleware.AuthMiddleware) *LoanProductController {
+	return &LoanProductController{ul: ul, rg: rg, jwt: jwt}
 }
