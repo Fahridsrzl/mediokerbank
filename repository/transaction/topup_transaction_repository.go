@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
@@ -21,7 +22,11 @@ type topupRepository struct {
 
 func (t *topupRepository) CreateTopup(payload model.TopupTransaction) (model.TopupTransaction, error) {
 	var topup model.TopupTransaction
-	err := t.db.QueryRow(rawquery.CreateTopup,
+	tx, err := t.db.Begin()
+	if err != nil {
+		return model.TopupTransaction{}, err
+	}
+	err = tx.QueryRow(rawquery.CreateTopup,
 		time.Now(),
 		payload.UserID,
 		payload.Amount,
@@ -38,7 +43,17 @@ func (t *topupRepository) CreateTopup(payload model.TopupTransaction) (model.Top
 		&topup.UpdatedAt,
 	)
 	if err != nil {
-		return model.TopupTransaction{}, err
+		tx.Rollback()
+		return model.TopupTransaction{}, errors.New("create trx: " + err.Error())
+	}
+	_, err = tx.Exec(rawquery.UpdateBalanceTopup, payload.Amount, payload.UserID)
+	if err != nil {
+		tx.Rollback()
+		return model.TopupTransaction{}, errors.New("user balance: " + err.Error())
+	}
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
+		return model.TopupTransaction{}, errors.New("commit: " + err.Error())
 	}
 	return topup, nil
 }

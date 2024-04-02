@@ -12,4 +12,5 @@ const (
 	WHERE user_id = $1`
 	GetAllTopUp = `SELECT id, trx_date, user_id, amount, status, created_at, updated_at
 	FROM topup_transactions`
+	UpdateBalanceTopup = `UPDATE users SET balance = balance + $1 WHERE id = $2`
 )

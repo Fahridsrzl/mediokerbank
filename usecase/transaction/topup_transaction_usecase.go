@@ -6,6 +6,7 @@ import (
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	repository "medioker-bank/repository/transaction"
+	usecase "medioker-bank/usecase/master"
 )
 
 type TopupUseCase interface {
@@ -16,14 +17,22 @@ type TopupUseCase interface {
 }
 
 type topupUseCase struct {
-	repo repository.TopupRepository
+	repo   repository.TopupRepository
+	userUc usecase.UserUseCase
 }
 
 func (u *topupUseCase) CreateTopup(topupDto dto.TopupDto) (model.TopupTransaction, error) {
+	user, err := u.userUc.GetUserByID(topupDto.UserID)
+	if err != nil {
+		return model.TopupTransaction{}, errors.New("find user: " + err.Error())
+	}
+	if user.Status != "verified" {
+		return model.TopupTransaction{}, errors.New("user unverified")
+	}
 	topup := model.TopupTransaction{
 		UserID: topupDto.UserID,
 		Amount: topupDto.Amount,
-		Status: topupDto.Status,
+		Status: "success",
 	}
 
 	createdtopup, err := u.repo.CreateTopup(topup)
