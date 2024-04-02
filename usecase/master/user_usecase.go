@@ -8,9 +8,9 @@ import (
 )
 
 type UserUseCase interface {
-	CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.User, model.Profile, model.Address, error)
+	CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.Profile, model.Address, error)
 	FindByStatus(status string) ([]dto.ResponseStatus, error)
-	UpdateStatus(id string) (model.User, error)
+	UpdateStatus(id string) error
 	GetUserByID(id string) (model.User, error)
 	RemoveUser(id string) (model.User, error)
 	GetAllUser() ([]dto.UserDto, error)
@@ -21,7 +21,7 @@ type userUseCase struct {
 	repo repository.UserRepository
 }
 
-func (u *userUseCase) CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.User, model.Profile, model.Address, error) {
+func (u *userUseCase) CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.Profile, model.Address, error) {
 	// Create Profile
 	profile := model.Profile{
 		FirstName:         profileDto.FirstName,
@@ -43,7 +43,7 @@ func (u *userUseCase) CreateProfileAndAddressThenUpdateUser(profileDto dto.Profi
 	}
 	createdProfile, err := u.repo.CreateProfile(profile)
 	if err != nil {
-		return model.User{}, model.Profile{}, model.Address{}, err
+		return model.Profile{}, model.Address{}, err
 	}
 
 	// create address
@@ -56,7 +56,7 @@ func (u *userUseCase) CreateProfileAndAddressThenUpdateUser(profileDto dto.Profi
 	}
 	createdAddress, err := u.repo.CreateAddress(address, createdProfile)
 	if err != nil {
-		return model.User{}, createdProfile, model.Address{}, err
+		return createdProfile, model.Address{}, err
 	}
 
 	// update User
@@ -64,12 +64,12 @@ func (u *userUseCase) CreateProfileAndAddressThenUpdateUser(profileDto dto.Profi
 		Status: "pending",
 		ID:     profileDto.UserID,
 	}
-	updatedUser, err := u.repo.UpdateUser(user)
+	err = u.repo.UpdateUser(user)
 	if err != nil {
-		return model.User{}, model.Profile{}, model.Address{}, err
+		return model.Profile{}, model.Address{}, err
 	}
 
-	return updatedUser, createdProfile, createdAddress, nil
+	return createdProfile, createdAddress, nil
 }
 
 func (u *userUseCase) FindByStatus(status string) ([]dto.ResponseStatus, error) {
@@ -81,17 +81,17 @@ func (u *userUseCase) FindByStatus(status string) ([]dto.ResponseStatus, error) 
 	return user, nil
 }
 
-func (u *userUseCase) UpdateStatus(id string) (model.User, error) {
+func (u *userUseCase) UpdateStatus(id string) error {
 	user := model.User{
 		Status: "verified",
 		ID:     id,
 	}
-	updatedStatus, err := u.repo.UpdateUser(user)
+	err := u.repo.UpdateUser(user)
 	if err != nil {
-		return model.User{}, err
+		return err
 	}
 
-	return updatedStatus, nil
+	return nil
 }
 
 func (u *userUseCase) GetUserByID(id string) (model.User, error) {

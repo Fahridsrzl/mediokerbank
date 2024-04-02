@@ -3,6 +3,6 @@ package appconfig
 const (
 	UserGroup  = "/users"
 	UserAll    = "/"
-	UserId     = "/id/:id"
+	UserId     = "/:id"
 	UserStatus = "/status/:status"
 )
