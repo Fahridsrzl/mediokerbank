@@ -15,13 +15,33 @@ type LoanTransactionController struct {
 	ul 	usecase.LoanTransactionUseCase
 }
 
+func (l *LoanTransactionController) GetLoanTransacttionByUserIdAndTrxId(ctx *gin.Context){
+	userId := ctx.Param("userId")
+	if userId == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "user_id can't be empty")
+		return
+	}
+	trxId := ctx.Param("trxId")
+	if userId == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "user_id can't be empty")
+		return
+	}
+	rspPayload, err := l.ul.FIndLoanTransactionByUserIdAndTrxId(userId,trxId)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Succes", rspPayload)
+}
+
 func (l *LoanTransactionController) GetAllHandler(ctx *gin.Context){
 	response, err := l.ul.FindAllLoanTransaction()
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	
 	common.SendSingleResponse(ctx, "Succes", response)
 }
 
@@ -74,7 +94,8 @@ func (l *LoanTransactionController) Router() {
 	br.POST(appconfig.LoanTransactionCreate, l.createHandler)
 	br.GET(appconfig.LoanTransactionFindById, l.GetHandlerById)
 	br.GET(appconfig.LoanTransactionFindByUserId, l.GetHandlerByUserId)
-	br.GET(appconfig.LoanProductFindAll, l.GetAllHandler)
+	br.GET(appconfig.LoanTransactionFindAll, l.GetAllHandler)
+	br.GET(appconfig.LoanTransactionFindByUserIdAndTrxId, l.GetLoanTransacttionByUserIdAndTrxId)
 }
 
 func NewLoanTransactionController(ul usecase.LoanTransactionUseCase, rg *gin.RouterGroup) *LoanTransactionController {

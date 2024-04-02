@@ -12,6 +12,7 @@ type LoanTransactionRepository interface {
 	GetAll() ([]model.LoanTransaction, error)
 	GetByID(id string) (model.LoanTransaction, error)
 	GetByUserID(UserId string) (model.LoanTransaction, error)
+	GetByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error)
 	Create(payload model.LoanTransaction) (model.LoanTransaction, error)
 }
 
@@ -19,19 +20,21 @@ type loanTransaction struct {
 	db *sql.DB
 }
 
-func (l *loanTransaction) GetAll() ([]model.LoanTransaction, error) {
+func (l *loanTransaction) GetByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error){
 	var loanTransactions []model.LoanTransaction
-	rows, err := l.db.Query(rawquery.GetAllLoanTransaction)
+
+	query := rawquery.GetLoanTransactionByUserIdAndTrxId
+	rows, err := l.db.Query(query, userId, trxId)
 	if err != nil {
-		return []model.LoanTransaction{}, err
+		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var loanTransaction model.LoanTransaction
 		var user model.User
 		var loanTransactionDetail model.LoanTransactionDetail
 		var loanProduct model.LoanProduct
+		var loanTransaction model.LoanTransaction
 
 		err := rows.Scan(
 			&loanTransaction.Id,
@@ -69,10 +72,70 @@ func (l *loanTransaction) GetAll() ([]model.LoanTransaction, error) {
 		loanTransaction.User = user
 		loanTransactionDetail.LoanProduct = loanProduct
 		loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
+		fmt.Println(loanTransaction)
 		loanTransactions = append(loanTransactions, loanTransaction)
 	}
 	return loanTransactions, nil
 }
+
+func (l *loanTransaction) GetAll() ([]model.LoanTransaction, error) {
+	var loanTransactions []model.LoanTransaction
+
+	query := rawquery.GetAllLoanTransaction
+	rows, err := l.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user model.User
+		var loanTransactionDetail model.LoanTransactionDetail
+		var loanProduct model.LoanProduct
+		var loanTransaction model.LoanTransaction
+
+		err := rows.Scan(
+			&loanTransaction.Id,
+			&loanTransaction.TrxDate,
+			&user.Id,
+			&user.Username,
+			&user.Email,
+			&loanTransaction.Status,
+			&loanTransaction.CreatedAt,
+			&loanTransaction.UpdatedAt,
+			&loanTransactionDetail.Id,
+			&loanProduct.Name,
+			&loanProduct.MaxAmount,
+			&loanProduct.MinInstallmentPeriod,
+			&loanProduct.MaxInstallmentPeriod,
+			&loanProduct.InstallmentPeriodUnit,
+			&loanProduct.AdminFee,
+			&loanProduct.MinCreditScore,
+			&loanProduct.MinMonthlyIncome,
+			&loanProduct.CreatedAt,
+			&loanProduct.UpdatedAt,
+			&loanTransactionDetail.Amount,
+			&loanTransactionDetail.Purpose,
+			&loanTransactionDetail.Interest,
+			&loanTransactionDetail.InstallmentPeriod,
+			&loanTransactionDetail.InstallmentUnit,
+			&loanTransactionDetail.InstallmentAmount,
+			&loanTransactionDetail.CreatedAt,
+			&loanTransactionDetail.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		loanTransaction.User = user
+		loanTransactionDetail.LoanProduct = loanProduct
+		loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
+		fmt.Println(loanTransaction)
+		loanTransactions = append(loanTransactions, loanTransaction)
+	}
+	return loanTransactions, nil
+}
+
 
 func (l *loanTransaction) GetByUserID(userId string) (model.LoanTransaction, error) {
 	var loanTransaction model.LoanTransaction

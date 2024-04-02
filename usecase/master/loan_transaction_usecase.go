@@ -9,6 +9,7 @@ import (
 
 type LoanTransactionUseCase interface {
 	FindAllLoanTransaction()([]model.LoanTransaction,error)
+	FIndLoanTransactionByUserIdAndTrxId(userId,trxId string)([]model.LoanTransaction, error)
 	FindById(id string) (model.LoanTransaction, error)
 	FindByUserId(userId string) (model.LoanTransaction, error)
 	RegisterNewTransaction(payload dto.LoanTransactionRequestDto) (model.LoanTransaction, error)
@@ -19,6 +20,16 @@ type loanTransactionUseCase struct {
 	userUC  UserUseCase
 	productUC LoanProductUseCase
 	loanRepo  repository.LoanRepository
+}
+
+func (l *loanTransactionUseCase) FIndLoanTransactionByUserIdAndTrxId(userId,trxId string)([]model.LoanTransaction, error){
+	var loanTransaction []model.LoanTransaction
+	var err error
+	loanTransaction, err = l.repo.GetByUserIdAndTrxId(userId,trxId)
+	if err != nil {
+		return []model.LoanTransaction{}, err
+	}
+	return loanTransaction, nil
 }
 
 func (l *loanTransactionUseCase) FindAllLoanTransaction()([]model.LoanTransaction,error){
