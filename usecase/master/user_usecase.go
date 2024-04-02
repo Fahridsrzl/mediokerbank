@@ -11,7 +11,7 @@ type UserUseCase interface {
 	CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.Profile, model.Address, error)
 	FindByStatus(status string) ([]dto.ResponseStatus, error)
 	UpdateStatus(id string) error
-	GetUserByID(id string) (model.User, error)
+	GetUserByID(id string) (model.User, []model.Loan, error) 
 	RemoveUser(id string) (model.User, error)
 	GetAllUser() ([]dto.UserDto, error)
 	UpdateUserBalance(id string, amount int) (int, error)
@@ -19,6 +19,7 @@ type UserUseCase interface {
 
 type userUseCase struct {
 	repo repository.UserRepository
+	loanrepo repository.LoanRepository
 }
 
 func (u *userUseCase) CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.Profile, model.Address, error) {
@@ -94,12 +95,18 @@ func (u *userUseCase) UpdateStatus(id string) error {
 	return nil
 }
 
-func (u *userUseCase) GetUserByID(id string) (model.User, error) {
+func (u *userUseCase) GetUserByID(id string) (model.User, []model.Loan, error) {
 	user, err := u.repo.GetUserByID(id)
 	if err != nil {
-		return model.User{}, err
+		return model.User{},nil, err
 	}
-	return user, nil
+
+	loans, err := u.loanrepo.FindByUserId(id)
+	if err != nil {
+		return model.User{}, nil, err
+	}
+
+	return user,loans, nil
 }
 
 func (u *userUseCase) RemoveUser(id string) (model.User, error) {
@@ -126,6 +133,6 @@ func (u *userUseCase) UpdateUserBalance(id string, amount int) (int, error) {
 	return newBalance, nil
 }
 
-func NewUserUseCase(repo repository.UserRepository) UserUseCase {
-	return &userUseCase{repo: repo}
+func NewUserUseCase(repo repository.UserRepository ,loanrepo repository.LoanRepository) UserUseCase {
+	return &userUseCase{repo: repo, loanrepo: loanrepo}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	appconfig "medioker-bank/config/app_config"
+	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/master"
 	"medioker-bank/utils/common"
@@ -123,13 +124,21 @@ func (e *UserController) updateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (e *UserController) getIdHandler(ctx *gin.Context) {
+func (u *UserController) getidHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	response, err := e.uc.GetUserByID(id)
+	user, loans, err := u.uc.GetUserByID(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	response := struct {
+		User  model.User   `json:"user"`
+		Loans []model.Loan `json:"loans"`
+	}{
+		User:  user,
+		Loans: loans,
 	}
 
 	common.SendSingleResponse(ctx, "ok", response)
@@ -164,7 +173,7 @@ func (u *UserController) Router() {
 	ur := u.rg.Group(appconfig.UserGroup)
 	ur.POST(appconfig.UserAll, u.createHandler)
 	ur.GET(appconfig.UserStatus, u.getStatusHandler)
-	ur.GET(appconfig.UserId, u.getIdHandler)
+	ur.GET(appconfig.UserId, u.getidHandler)
 	ur.GET(appconfig.UserAll, u.getAllUserHandler)
 	ur.PUT(appconfig.UserId, u.updateHandler)
 	ur.DELETE(appconfig.UserId, u.deletehandler)

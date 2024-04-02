@@ -22,7 +22,7 @@ func (u useCaseManager) LoanProductUseCase() master.LoanProductUseCase {
 }
 
 func (u *useCaseManager) UserUseCase() master.UserUseCase {
-	return master.NewUserUseCase(u.repo.UserRepo())
+	return master.NewUserUseCase(u.repo.UserRepo(), u.repo.LoanRepo())
 }
 
 func (u *useCaseManager) TopupUseCase() transaction.TopupUseCase {

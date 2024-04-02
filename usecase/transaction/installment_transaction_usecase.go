@@ -67,7 +67,7 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		UserId:    payload.UserId,
 		TrxDetail: trxd,
 	}
-	user, err := i.userUc.GetUserByID(trxReq.UserId)
+	user,loans, err := i.userUc.GetUserByID(trxReq.UserId)
 	if err != nil {
 		return dto.InstallmentTransactionResponseDto{}, err
 	}
