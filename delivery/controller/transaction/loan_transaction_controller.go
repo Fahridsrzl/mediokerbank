@@ -47,7 +47,7 @@ func (l *LoanTransactionController) GetAllHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Succes", response)
 }
 
-func (l *LoanTransactionController) createHandler(ctx *gin.Context) {
+func (l *LoanTransactionController) CreateHandler(ctx *gin.Context) {
 	var payload dto.LoanTransactionRequestDto
 	if err := ctx.ShouldBind(&payload); err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
@@ -94,7 +94,7 @@ func (l *LoanTransactionController) GetHandlerById(ctx *gin.Context) {
 func (l *LoanTransactionController) Router() {
 	br := l.rg.Group(appconfig.LoanTransactionGroup)
 	{
-		br.POST(appconfig.LoanTransactionCreate, l.jwt.RequireToken("user"), l.createHandler)
+		br.POST(appconfig.LoanTransactionCreate, l.jwt.RequireToken("user"), l.CreateHandler)
 		br.GET(appconfig.LoanTransactionFindById, l.jwt.RequireToken("admin"), l.GetHandlerById)
 		br.GET(appconfig.LoanTransactionFindByUserId, l.jwt.RequireToken("user"), l.GetHandlerByUserId)
 		br.GET(appconfig.LoanTransactionFindAll, l.jwt.RequireToken("admin"), l.GetAllHandler)

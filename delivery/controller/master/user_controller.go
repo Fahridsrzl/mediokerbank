@@ -25,7 +25,7 @@ type UserController struct {
 	jwt middleware.AuthMiddleware
 }
 
-func (u *UserController) createHandler(ctx *gin.Context) {
+func (u *UserController) CreateHandler(ctx *gin.Context) {
 	profile := ctx.PostForm("profile")
 	address := ctx.PostForm("address")
 
@@ -100,7 +100,7 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
-func (e *UserController) getStatusHandler(ctx *gin.Context) {
+func (e *UserController) GetStatusHandler(ctx *gin.Context) {
 	status := ctx.Param("status")
 
 	response, err := e.uc.FindByStatus(status)
@@ -112,7 +112,7 @@ func (e *UserController) getStatusHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", response)
 }
 
-func (e *UserController) updateHandler(ctx *gin.Context) {
+func (e *UserController) UpdateHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	err := e.uc.UpdateStatus(id)
@@ -126,7 +126,7 @@ func (e *UserController) updateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (u *UserController) getidHandler(ctx *gin.Context) {
+func (u *UserController) GetidHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	user, loans, err := u.uc.GetUserByID(id)
@@ -155,7 +155,7 @@ func (u *UserController) getidHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (e *UserController) deletehandler(ctx *gin.Context) {
+func (e *UserController) Deletehandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	_, err := e.uc.RemoveUser(id)
@@ -169,7 +169,7 @@ func (e *UserController) deletehandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "delete", response)
 }
 
-func (u *UserController) getAllUserHandler(ctx *gin.Context) {
+func (u *UserController) GetAllUserHandler(ctx *gin.Context) {
 	users, err := u.uc.GetAllUser()
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -183,12 +183,12 @@ func (u *UserController) getAllUserHandler(ctx *gin.Context) {
 func (u *UserController) Router() {
 	ur := u.rg.Group(appconfig.UserGroup)
 	{
-		ur.POST(appconfig.UserAll, u.jwt.RequireToken("user"), u.createHandler)
-		ur.GET(appconfig.UserStatus, u.jwt.RequireToken("admin"), u.getStatusHandler)
-		ur.GET(appconfig.UserId, u.jwt.RequireToken("admin", "user"), u.getidHandler)
-		ur.GET(appconfig.UserAll, u.jwt.RequireToken("admin"), u.getAllUserHandler)
-		ur.PUT(appconfig.UserId, u.jwt.RequireToken("admin"), u.updateHandler)
-		ur.DELETE(appconfig.UserId, u.jwt.RequireToken("admin"), u.deletehandler)
+		ur.POST(appconfig.UserAll, u.jwt.RequireToken("user"), u.CreateHandler)
+		ur.GET(appconfig.UserStatus, u.jwt.RequireToken("admin"), u.GetStatusHandler)
+		ur.GET(appconfig.UserId, u.jwt.RequireToken("admin", "user"), u.GetidHandler)
+		ur.GET(appconfig.UserAll, u.jwt.RequireToken("admin"), u.GetAllUserHandler)
+		ur.PUT(appconfig.UserId, u.jwt.RequireToken("admin"), u.UpdateHandler)
+		ur.DELETE(appconfig.UserId, u.jwt.RequireToken("admin"), u.Deletehandler)
 	}
 }
 

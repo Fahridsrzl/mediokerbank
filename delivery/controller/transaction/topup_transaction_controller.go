@@ -17,7 +17,7 @@ type TopupController struct {
 	jwt middleware.AuthMiddleware
 }
 
-func (t *TopupController) createHandler(ctx *gin.Context) {
+func (t *TopupController) CreateHandler(ctx *gin.Context) {
 	var payload dto.TopupDto
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
@@ -32,7 +32,7 @@ func (t *TopupController) createHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
-func (e *TopupController) getTopupIdHandler(ctx *gin.Context) {
+func (e *TopupController) GetTopupIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	response, err := e.tc.GetTopUpByTopupId(id)
@@ -44,7 +44,7 @@ func (e *TopupController) getTopupIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (e *TopupController) getTopupUserIdHandler(ctx *gin.Context) {
+func (e *TopupController) GetTopupUserIdHandler(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 
 	response, err := e.tc.GetTopupByUserId(userId)
@@ -56,7 +56,7 @@ func (e *TopupController) getTopupUserIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (u *TopupController) getAllTopupHandler(ctx *gin.Context) {
+func (u *TopupController) GetAllTopupHandler(ctx *gin.Context) {
 	topups, err := u.tc.GetAllTopUp()
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -70,10 +70,10 @@ func (u *TopupController) getAllTopupHandler(ctx *gin.Context) {
 func (t *TopupController) Router() {
 	ur := t.rg.Group(appconfig.TopupGroup)
 	{
-		ur.POST(appconfig.Topup, t.jwt.RequireToken("user"), t.createHandler)
-		ur.GET(appconfig.Topup, t.jwt.RequireToken("admin"), t.getAllTopupHandler)
-		ur.GET(appconfig.TopupId, t.jwt.RequireToken("admin"), t.getTopupIdHandler)
-		ur.GET(appconfig.TopupUser, t.jwt.RequireToken("user"), t.getTopupUserIdHandler)
+		ur.POST(appconfig.Topup, t.jwt.RequireToken("user"), t.CreateHandler)
+		ur.GET(appconfig.Topup, t.jwt.RequireToken("admin"), t.GetAllTopupHandler)
+		ur.GET(appconfig.TopupId, t.jwt.RequireToken("admin"), t.GetTopupIdHandler)
+		ur.GET(appconfig.TopupUser, t.jwt.RequireToken("user"), t.GetTopupUserIdHandler)
 	}
 }
 

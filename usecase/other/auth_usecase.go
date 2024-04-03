@@ -24,6 +24,7 @@ type authUseCase struct {
 	repo   repository.AuthRepository
 	jwt    common.JwtToken
 	mailer common.Mailer
+	bcrypt common.BcryptService
 }
 
 func (a *authUseCase) RegisterUser(payload dto.AuthRegisterDto) (string, error) {
@@ -39,7 +40,7 @@ func (a *authUseCase) RegisterUser(payload dto.AuthRegisterDto) (string, error) 
 	if payload.Password != payload.ConfirmPassword {
 		return "", errors.New("password and confirmPassword do not match")
 	}
-	payload.Password, err = common.GeneratePasswordHash(payload.Password)
+	payload.Password, err = a.bcrypt.GeneratePasswordHash(payload.Password)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +105,7 @@ func (a *authUseCase) LoginUser(payload dto.AuthLoginDto) (dto.AuthResponseDto, 
 	if err != nil {
 		return dto.AuthResponseDto{}, err
 	}
-	err = common.ComparePasswordHash(user.Password, payload.Password)
+	err = a.bcrypt.ComparePasswordHash(user.Password, payload.Password)
 	if err != nil {
 		return dto.AuthResponseDto{}, errors.New("wrong password")
 	}
@@ -153,6 +154,6 @@ func (a *authUseCase) LoginAdmin(payload dto.AuthLoginDto) (dto.AuthResponseDto,
 	return tokens, nil
 }
 
-func NewAuthUseCase(repo repository.AuthRepository, jwt common.JwtToken, mailer common.Mailer) AuthUseCase {
-	return &authUseCase{repo: repo, jwt: jwt, mailer: mailer}
+func NewAuthUseCase(repo repository.AuthRepository, jwt common.JwtToken, mailer common.Mailer, bcrypt common.BcryptService) AuthUseCase {
+	return &authUseCase{repo: repo, jwt: jwt, mailer: mailer, bcrypt: bcrypt}
 }

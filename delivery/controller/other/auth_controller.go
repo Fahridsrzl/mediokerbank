@@ -17,7 +17,7 @@ type AuthController struct {
 	jwt common.JwtToken
 }
 
-func (a *AuthController) registerHandler(ctx *gin.Context) {
+func (a *AuthController) RegisterHandler(ctx *gin.Context) {
 	var payload dto.AuthRegisterDto
 	err := ctx.ShouldBindJSON(&payload)
 	if err != nil {
@@ -32,7 +32,7 @@ func (a *AuthController) registerHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "Success", response)
 }
 
-func (a *AuthController) verifyHandler(ctx *gin.Context) {
+func (a *AuthController) VerifyHandler(ctx *gin.Context) {
 	var vCode dto.AuthVcodeDto
 	err := ctx.ShouldBindJSON(&vCode)
 	if err != nil {
@@ -47,7 +47,7 @@ func (a *AuthController) verifyHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "Success", response)
 }
 
-func (a *AuthController) loginUserHandler(ctx *gin.Context) {
+func (a *AuthController) LoginUserHandler(ctx *gin.Context) {
 	var payload dto.AuthLoginDto
 	err := ctx.ShouldBindJSON(&payload)
 	if err != nil {
@@ -62,7 +62,7 @@ func (a *AuthController) loginUserHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
-func (a *AuthController) loginAdminHandler(ctx *gin.Context) {
+func (a *AuthController) LoginAdminHandler(ctx *gin.Context) {
 	var payload dto.AuthLoginDto
 	err := ctx.ShouldBindJSON(&payload)
 	if err != nil {
@@ -90,10 +90,10 @@ func (a *AuthController) RefreshTokenHandler(ctx *gin.Context) {
 func (a *AuthController) Router() {
 	authGroup := a.rg.Group(appconfig.AuthGroup)
 	{
-		authGroup.POST(appconfig.AuthRegisterUser, a.registerHandler)
-		authGroup.POST(appconfig.AuthVerifyUser, a.verifyHandler)
-		authGroup.POST(appconfig.AuthLoginUser, a.loginUserHandler)
-		authGroup.POST(appconfig.AuthLoginAdmin, a.loginAdminHandler)
+		authGroup.POST(appconfig.AuthRegisterUser, a.RegisterHandler)
+		authGroup.POST(appconfig.AuthVerifyUser, a.VerifyHandler)
+		authGroup.POST(appconfig.AuthLoginUser, a.LoginUserHandler)
+		authGroup.POST(appconfig.AuthLoginAdmin, a.LoginAdminHandler)
 		authGroup.POST(appconfig.AuthRefreshToken, a.RefreshTokenHandler)
 	}
 }

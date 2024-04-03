@@ -63,6 +63,7 @@ func NewServer() *Server {
 	logService := common.NewMyLogger(cfg.LogFileConfig)
 	jwt := common.NewJwtToken(cfg.TokenConfig)
 	mailer := common.NewMailer(cfg.MailerConfig)
+	bcrypt := common.NewBcryptService()
 	midtransService := common.NewMidtransService(cfg.MidtransConfig)
 	return &Server{
 		uc:             usecaseManager,
@@ -70,7 +71,7 @@ func NewServer() *Server {
 		host:           host,
 		logService:     logService,
 		jwt:            jwt,
-		auth:           uOther.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer),
+		auth:           uOther.NewAuthUseCase(repoManager.AuthRepo(), jwt, mailer, bcrypt),
 		installmentTrx: uTransaction.NewInstallmentTransactionUseCase(repoManager.InstallmentTransactionRepo(), repoManager.LoanRepo(), usecaseManager.UserUseCase(), usecaseManager.LoanProductUseCase(), midtransService),
 	}
 }

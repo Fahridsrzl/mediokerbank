@@ -17,7 +17,7 @@ type InstallmentTransactionController struct {
 	jwt middleware.AuthMiddleware
 }
 
-func (i *InstallmentTransactionController) createTrxHandler(ctx *gin.Context) {
+func (i *InstallmentTransactionController) CreateTrxHandler(ctx *gin.Context) {
 	var payload dto.InstallmentTransactionRequestDto
 	err := ctx.ShouldBindJSON(&payload)
 	if err != nil {
@@ -32,7 +32,7 @@ func (i *InstallmentTransactionController) createTrxHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
-func (i *InstallmentTransactionController) findTrxByIdHandler(ctx *gin.Context) {
+func (i *InstallmentTransactionController) FindTrxByIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	response, err := i.uc.FindTrxById(id)
 	if err != nil {
@@ -42,7 +42,7 @@ func (i *InstallmentTransactionController) findTrxByIdHandler(ctx *gin.Context) 
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
-func (i *InstallmentTransactionController) findTrxManyHandler(ctx *gin.Context) {
+func (i *InstallmentTransactionController) FindTrxManyHandler(ctx *gin.Context) {
 	payload := dto.InstallmentTransactionSearchDto{
 		TrxDate: ctx.Query("trxDate"),
 	}
@@ -54,7 +54,7 @@ func (i *InstallmentTransactionController) findTrxManyHandler(ctx *gin.Context) 
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
-func (i *InstallmentTransactionController) findTrxByUserIdHandler(ctx *gin.Context) {
+func (i *InstallmentTransactionController) FindTrxByUserIdHandler(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 	payload := dto.InstallmentTransactionSearchDto{
 		TrxDate: ctx.Query("trxDate"),
@@ -67,7 +67,7 @@ func (i *InstallmentTransactionController) findTrxByUserIdHandler(ctx *gin.Conte
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
-func (i *InstallmentTransactionController) findTrxByUserIdAndTrxIdHandler(ctx *gin.Context) {
+func (i *InstallmentTransactionController) FindTrxByUserIdAndTrxIdHandler(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 	trxId := ctx.Param("trxId")
 	response, err := i.uc.FindTrxByUserIdAndTrxId(userId, trxId)
@@ -78,7 +78,7 @@ func (i *InstallmentTransactionController) findTrxByUserIdAndTrxIdHandler(ctx *g
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
-func (i *InstallmentTransactionController) midtransHookHandler(ctx *gin.Context) {
+func (i *InstallmentTransactionController) MidtransHookHandler(ctx *gin.Context) {
 	id := ctx.Query("order_id")
 	err := i.uc.UpdateTrxById(id)
 	if err != nil {
@@ -91,12 +91,12 @@ func (i *InstallmentTransactionController) midtransHookHandler(ctx *gin.Context)
 func (i *InstallmentTransactionController) Router() {
 	installmentGroup := i.rg.Group(appconfig.InstallmentGroup)
 	{
-		installmentGroup.POST(appconfig.InstallmentCreate, i.jwt.RequireToken("user"), i.createTrxHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxById, i.jwt.RequireToken("admin"), i.findTrxByIdHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxMany, i.jwt.RequireToken("admin"), i.findTrxManyHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxByUserId, i.jwt.RequireToken("user"), i.findTrxByUserIdHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxByUserAndTrxId, i.jwt.RequireToken("user"), i.findTrxByUserIdAndTrxIdHandler)
-		installmentGroup.GET(appconfig.InstallmentMidtransHook, i.midtransHookHandler)
+		installmentGroup.POST(appconfig.InstallmentCreate, i.jwt.RequireToken("user"), i.CreateTrxHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxById, i.jwt.RequireToken("admin"), i.FindTrxByIdHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxMany, i.jwt.RequireToken("admin"), i.FindTrxManyHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxByUserId, i.jwt.RequireToken("user"), i.FindTrxByUserIdHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxByUserAndTrxId, i.jwt.RequireToken("user"), i.FindTrxByUserIdAndTrxIdHandler)
+		installmentGroup.GET(appconfig.InstallmentMidtransHook, i.MidtransHookHandler)
 	}
 }
 

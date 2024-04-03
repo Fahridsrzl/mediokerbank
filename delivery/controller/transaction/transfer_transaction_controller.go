@@ -17,7 +17,7 @@ type TransferController struct {
 	jwt middleware.AuthMiddleware
 }
 
-func (t *TransferController) createHandler(ctx *gin.Context) {
+func (t *TransferController) CreateHandler(ctx *gin.Context) {
 	var payload dto.TransferDto
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
@@ -32,7 +32,7 @@ func (t *TransferController) createHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
-func (e *TransferController) getSenderIdHandler(ctx *gin.Context) {
+func (e *TransferController) GetSenderIdHandler(ctx *gin.Context) {
 	id := ctx.Param("senderId")
 
 	response, err := e.tc.GetTransferBySenderId(id)
@@ -44,7 +44,7 @@ func (e *TransferController) getSenderIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (e *TransferController) getTransferIdHandler(ctx *gin.Context) {
+func (e *TransferController) GetTransferIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	response, err := e.tc.GetTransferByTransferId(id)
@@ -56,7 +56,7 @@ func (e *TransferController) getTransferIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
-func (u *TransferController) getAllTransferHandler(ctx *gin.Context) {
+func (u *TransferController) GetAllTransferHandler(ctx *gin.Context) {
 	transfers, err := u.tc.GetAllTransfer()
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -70,10 +70,10 @@ func (u *TransferController) getAllTransferHandler(ctx *gin.Context) {
 func (t *TransferController) Router() {
 	ur := t.rg.Group(appconfig.TransferGroup)
 	{
-		ur.POST(appconfig.Transfer, t.jwt.RequireToken("user"), t.createHandler)
-		ur.GET(appconfig.Transfer, t.jwt.RequireToken("admin"), t.getAllTransferHandler)
-		ur.GET(appconfig.TransferSenderId, t.jwt.RequireToken("user"), t.getSenderIdHandler)
-		ur.GET(appconfig.TransferId, t.jwt.RequireToken("user"), t.getTransferIdHandler)
+		ur.POST(appconfig.Transfer, t.jwt.RequireToken("user"), t.CreateHandler)
+		ur.GET(appconfig.Transfer, t.jwt.RequireToken("admin"), t.GetAllTransferHandler)
+		ur.GET(appconfig.TransferSenderId, t.jwt.RequireToken("user"), t.GetSenderIdHandler)
+		ur.GET(appconfig.TransferId, t.jwt.RequireToken("user"), t.GetTransferIdHandler)
 	}
 }
 
