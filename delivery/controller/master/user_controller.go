@@ -25,6 +25,23 @@ type UserController struct {
 	jwt middleware.AuthMiddleware
 }
 
+// createHandler handles user registration
+// @Summary Create user profile and address
+// @Description Register a new user and create profile and address
+// @Tags User
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param profile formData string true "User profile data"
+// @Param address formData string true "User address data"
+// @Param photo formData file true "User profile photo"
+// @Param idCard formData file true "User ID card photo"
+// @Param salarySlip formData file true "User salary slip"
+// @Success 201 {string} string "User registered successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /users [post]
 func (u *UserController) CreateHandler(ctx *gin.Context) {
 	profile := ctx.PostForm("profile")
 	address := ctx.PostForm("address")
@@ -100,6 +117,19 @@ func (u *UserController) CreateHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
+// getStatusHandler handles getting users by status
+// @Summary Get users by status
+// @Description Retrieve users based on status
+// @Tags User
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param status path string true "User status"
+// @Success 200 {object} map[string]interface{} "List of users"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /users/status/{status} [get]
 func (e *UserController) GetStatusHandler(ctx *gin.Context) {
 	status := ctx.Param("status")
 
@@ -112,6 +142,19 @@ func (e *UserController) GetStatusHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", response)
 }
 
+// updateHandler handles updating user status
+// @Summary Update user status
+// @Description Update user status by ID
+// @Tags User
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {string} string "User status updated successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /users/{id} [put]
 func (e *UserController) UpdateHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -126,6 +169,19 @@ func (e *UserController) UpdateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
+// getidHandler handles getting user by ID
+// @Summary Get user by ID
+// @Description Retrieve user by ID
+// @Tags User
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} map[string]interface{} "User details"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /users/{id} [get]
 func (u *UserController) GetidHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -155,6 +211,19 @@ func (u *UserController) GetidHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
+// deletehandler handles deleting user by ID
+// @Summary Delete user by ID
+// @Description Delete user by ID
+// @Tags User
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {string} string "User deleted successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /users/{id} [delete]
 func (e *UserController) Deletehandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -169,6 +238,18 @@ func (e *UserController) Deletehandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "delete", response)
 }
 
+// getAllUserHandler handles getting all users
+// @Summary Get all users
+// @Description Retrieve all users
+// @Tags User
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of users"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /users [get]
 func (u *UserController) GetAllUserHandler(ctx *gin.Context) {
 	users, err := u.uc.GetAllUser()
 	if err != nil {

@@ -11,12 +11,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Status struct {
+	Code        int    `json:"code"`
+	Description string `json:"description"`
+}
+
 type LoanProductController struct {
 	rg  *gin.RouterGroup
 	ul  usecase.LoanProductUseCase
 	jwt middleware.AuthMiddleware
 }
 
+// @Summary Get loan product by ID
+// @Description Get loan product details by ID
+// @ID get-loan-product-by-id
+// @Param id path string true "Loan Product ID"
+// @Tags Loan Product
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Produce json
+// @Success 200 {object} model.LoanProduct
+// @Failure 400 {object} Status
+// @Failure 500 {object} Status
+// @Router /loan-products/{id} [get]
 func (l *LoanProductController) GetHandlerById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
@@ -32,6 +49,16 @@ func (l *LoanProductController) GetHandlerById(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Succes", response)
 }
 
+// @Summary Get all loan products
+// @Description Get all loan products
+// @ID get-all-loan-products
+// @Tags Loan Product
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Produce json
+// @Success 200 {array} model.LoanProduct
+// @Failure 500 {object} Status
+// @Router /loan-products [get]
 func (l *LoanProductController) GetAllHandler(ctx *gin.Context) {
 	response, err := l.ul.FindAllLoanProduct()
 	if err != nil {
@@ -42,6 +69,19 @@ func (l *LoanProductController) GetAllHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Succes", response)
 }
 
+// @Summary Create a new loan product
+// @Description Create a new loan product
+// @ID create-loan-product
+// @Tags Loan Product
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param request body model.LoanProduct true "Loan Product Object"
+// @Success 200 {object} model.LoanProduct
+// @Failure 400 {object} Status
+// @Failure 500 {object} Status
+// @Router /loan-products [post]
 func (l *LoanProductController) CreateHandler(ctx *gin.Context) {
 	var payload model.LoanProduct
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -57,6 +97,21 @@ func (l *LoanProductController) CreateHandler(ctx *gin.Context) {
 
 	common.SendSingleResponse(ctx, "Created", createdProduct)
 }
+
+/// @Summary Update a loan product
+// @Description Update an existing loan product
+// @ID update-loan-product
+// @Tags Loan Product
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "Loan Product ID"
+// @Param request body model.LoanProduct true "Updated Loan Product Object"
+// @Success 200 {object} model.LoanProduct
+// @Failure 400 {object} Status
+// @Failure 500 {object} Status
+// @Router /loan-products/{id} [put]
 func (l *LoanProductController) UpdateHandler(ctx *gin.Context) {
 	var payload model.LoanProduct
 	id := ctx.Param("id")
@@ -74,6 +129,18 @@ func (l *LoanProductController) UpdateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Updated successfully", response)
 }
 
+// @Summary Delete a loan product
+// @Description Delete an existing loan product
+// @ID delete-loan-product
+// @Param id path string true "Loan Product ID"
+// @Tags Loan Product
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Produce json
+// @Success 200 {object} model.LoanProduct
+// @Failure 400 {object} Status
+// @Failure 500 {object} Status
+// @Router /loan-products/{id} [delete]
 func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
@@ -90,7 +157,9 @@ func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Deleted successfully", response)
 }
 
+
 func (l *LoanProductController) Router() {
+
 	spc := l.rg.Group(appconfig.LoanProductGroup)
 	{
 		spc.POST(appconfig.LoanProductCreate, l.jwt.RequireToken("admin"), l.CreateHandler)

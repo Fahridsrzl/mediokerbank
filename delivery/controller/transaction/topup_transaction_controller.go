@@ -17,6 +17,19 @@ type TopupController struct {
 	jwt middleware.AuthMiddleware
 }
 
+// createHandler handles creating a new topup
+// @Summary Create a new topup
+// @Description Create a new topup
+// @Tags Topup
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param body body dto.TopupDto true "Topup data"
+// @Success 201 {string} string "Topup created successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/topups [post]
 func (t *TopupController) CreateHandler(ctx *gin.Context) {
 	var payload dto.TopupDto
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -32,6 +45,18 @@ func (t *TopupController) CreateHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
+// getTopupIdHandler handles getting a topup by ID
+// @Summary Get topup by ID
+// @Description Retrieve topup details by ID
+// @Tags Topup
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "Topup ID"
+// @Success 200 {object} map[string]interface{} "Topup details"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/topups/{id} [get]
 func (e *TopupController) GetTopupIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -44,6 +69,18 @@ func (e *TopupController) GetTopupIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
+// getTopupUserIdHandler handles getting topups by user ID
+// @Summary Get topups by user ID
+// @Description Retrieve topups for a specific user
+// @Tags Topup
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param userId path string true "User ID"
+// @Success 200 {object} map[string]interface{} "List of topups"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/topups/user/{userId} [get]
 func (e *TopupController) GetTopupUserIdHandler(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 
@@ -56,6 +93,17 @@ func (e *TopupController) GetTopupUserIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
+// getAllTopupHandler handles getting all topups
+// @Summary Get all topups
+// @Description Retrieve all topups
+// @Tags Topup
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of topups"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/topups [get]
 func (u *TopupController) GetAllTopupHandler(ctx *gin.Context) {
 	topups, err := u.tc.GetAllTopUp()
 	if err != nil {

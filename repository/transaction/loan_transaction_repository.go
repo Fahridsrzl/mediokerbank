@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"medioker-bank/model"
 	rawquery "medioker-bank/utils/raw_query"
-	"time"
 )
 
 type LoanTransactionRepository interface {
@@ -243,7 +242,7 @@ func (l *loanTransaction) Create(payload model.LoanTransaction) (model.LoanTrans
 	}
 
 	var loanTransaction model.LoanTransaction
-	err = tx.QueryRow(rawquery.CreateLoanTransaction, time.Now(), payload.User.ID, "active").Scan(
+	err = tx.QueryRow(rawquery.CreateLoanTransaction, payload.User.ID, "active").Scan(
 		&loanTransaction.Id,
 		&loanTransaction.TrxDate,
 		&loanTransaction.User.ID,

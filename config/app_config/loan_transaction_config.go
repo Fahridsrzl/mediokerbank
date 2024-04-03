@@ -4,7 +4,7 @@ const (
 	LoanTransactionGroup                = "/transactions/loans"
 	LoanTransactionCreate               = "/"
 	LoanTransactionFindAll              = "/"
-	LoanTransactionFindById             = "/:id"
+	LoanTransactionFindById             = "/:Id"
 	LoanTransactionFindByUserId         = "/users/:userId"
 	LoanTransactionFindByUserIdAndTrxId = "users/:userId/:trxId"
 	// LoanProductFindAll = "/"

@@ -19,7 +19,7 @@ type loanRepository struct {
 
 func (l *loanRepository) Create(payload model.Loan) (model.Loan, error) {
 	var loan model.Loan
-	err := l.db.QueryRow(rawquery.CreateLoan, payload).Scan(
+	err := l.db.QueryRow(rawquery.CreateLoan, payload.UserId, payload.LoanProduct.Id, payload.Amount, payload.Interest, payload.InstallmentAmount, payload.InstallmentPeriod, payload.InstallmentUnit, payload.PeriodLeft, payload.Status).Scan(
 		&loan.Id, &loan.UserId, &loan.LoanProduct.Id, &loan.Amount, &loan.Interest, &loan.InstallmentAmount, &loan.InstallmentPeriod, &loan.InstallmentUnit, &loan.PeriodLeft, &loan.Status, &loan.CreatedAt, &loan.UpdatedAt,
 	)
 	if err != nil {

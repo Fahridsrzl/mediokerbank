@@ -17,6 +17,19 @@ type TransferController struct {
 	jwt middleware.AuthMiddleware
 }
 
+// createHandler handles creating a new transfer
+// @Summary Create a new transfer
+// @Description Create a new transfer
+// @Tags Transfer
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param body body dto.TransferDto true "Transfer data"
+// @Success 201 {string} string "Transfer created successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/transfers [post]
 func (t *TransferController) CreateHandler(ctx *gin.Context) {
 	var payload dto.TransferDto
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -32,6 +45,18 @@ func (t *TransferController) CreateHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", respPayload)
 }
 
+// getSenderIdHandler handles getting a transfer by sender ID
+// @Summary Get transfer by sender ID
+// @Description Retrieve transfer details by sender ID
+// @Tags Transfer
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param senderId path string true "Sender ID"
+// @Success 200 {object} map[string]interface{} "Transfer details"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/transfers/users/{senderId} [get]
 func (e *TransferController) GetSenderIdHandler(ctx *gin.Context) {
 	id := ctx.Param("senderId")
 
@@ -44,6 +69,18 @@ func (e *TransferController) GetSenderIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
+// getTransferIdHandler handles getting a transfer by ID
+// @Summary Get transfer by ID
+// @Description Retrieve transfer details by ID
+// @Tags Transfer
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "Transfer ID"
+// @Success 200 {object} map[string]interface{} "Transfer details"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/transfers/{id} [get]
 func (e *TransferController) GetTransferIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -56,6 +93,17 @@ func (e *TransferController) GetTransferIdHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", response)
 }
 
+// getAllTransferHandler handles getting all transfers
+// @Summary Get all transfers
+// @Description Retrieve all transfers
+// @Tags Transfer
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "List of transfers"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/transfers [get]
 func (u *TransferController) GetAllTransferHandler(ctx *gin.Context) {
 	transfers, err := u.tc.GetAllTransfer()
 	if err != nil {
