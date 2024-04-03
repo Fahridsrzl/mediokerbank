@@ -15,6 +15,8 @@ import (
 	"medioker-bank/utils/common"
 
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 type Server struct {
@@ -59,6 +61,8 @@ func NewServer() *Server {
 	usecaseManager := manager.NewUseCaseManager(repoManager)
 
 	engine := gin.Default()
+	// add swagger
+	engine.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	logService := common.NewMyLogger(cfg.LogFileConfig)
 	jwt := common.NewJwtToken(cfg.TokenConfig)

@@ -1,4 +1,1388 @@
+basePath: /api/v1
+definitions:
+  controller.Status:
+    properties:
+      code:
+        type: integer
+      description:
+        type: string
+    type: object
+  dto.AuthLoginDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    type: object
+  dto.AuthRegisterDto:
+    properties:
+      confirmPassword:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - confirmPassword
+    - email
+    - password
+    - username
+    type: object
+  dto.InstallmentTransactionRequestDto:
+    properties:
+      loanId:
+        type: string
+      paymentMethod:
+        type: string
+      userId:
+        type: string
+    required:
+    - loanId
+    - paymentMethod
+    - userId
+    type: object
+  dto.LoanTransactionDetailRequestDto:
+    properties:
+      amount:
+        type: integer
+      installmentPeriod:
+        type: integer
+      productId:
+        type: string
+      purpose:
+        type: string
+    required:
+    - amount
+    - installmentPeriod
+    - productId
+    - purpose
+    type: object
+  dto.LoanTransactionRequestDto:
+    properties:
+      loanTransactionDetail:
+        items:
+          $ref: '#/definitions/dto.LoanTransactionDetailRequestDto'
+        type: array
+      userId:
+        type: string
+    required:
+    - userId
+    type: object
+  dto.TopupDto:
+    properties:
+      amount:
+        type: integer
+      status:
+        type: string
+      userId:
+        type: string
+    type: object
+  dto.TransferDto:
+    properties:
+      amount:
+        type: integer
+      receiverId:
+        type: string
+      senderId:
+        type: string
+    type: object
+  model.LoanProduct:
+    properties:
+      adminFee:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: string
+      installmentPeriodUnit:
+        type: string
+      maxAmount:
+        type: integer
+      maxInstallmentPeriod:
+        type: integer
+      minCreditScore:
+        type: integer
+      minInstallmentPeriod:
+        type: integer
+      minMothlyIncome:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  description: A Tag service API in Go using Gin framework
+  title: Tag Service API
+  version: "1.0"
+paths:
+  /auth/admins/login:
+    post:
+      consumes:
+      - application/json
+      description: Login admin with username and password
+      operationId: login-admin
+      parameters:
+      - description: Admin login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthLoginDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Admin logged in successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login admin
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access token using refresh token
+      operationId: refresh-token
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Access token refreshed successfully
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Refresh access token
+  /auth/users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user with username and password
+      operationId: login-user
+      parameters:
+      - description: User login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthLoginDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged in successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login user
+  /auth/users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      operationId: register-user
+      parameters:
+      - description: User registration details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthRegisterDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+  /auth/users/register/verify:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      operationId: verify-user
+      parameters:
+      - description: User registration details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthRegisterDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+  /loan-products:
+    get:
+      description: Get all loan products
+      operationId: get-all-loan-products
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.LoanProduct'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.Status'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all loan products
+      tags:
+      - Loan Product
+    post:
+      consumes:
+      - application/json
+      description: Create a new loan product
+      operationId: create-loan-product
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Loan Product Object
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoanProduct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LoanProduct'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.Status'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new loan product
+      tags:
+      - Loan Product
+  /loan-products/{id}:
+    delete:
+      description: Delete an existing loan product
+      operationId: delete-loan-product
+      parameters:
+      - description: Loan Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LoanProduct'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.Status'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a loan product
+      tags:
+      - Loan Product
+    get:
+      description: Get loan product details by ID
+      operationId: get-loan-product-by-id
+      parameters:
+      - description: Loan Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LoanProduct'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.Status'
+      security:
+      - ApiKeyAuth: []
+      summary: Get loan product by ID
+      tags:
+      - Loan Product
+    put:
+      consumes:
+      - application/json
+      description: Update an existing loan product
+      operationId: update-loan-product
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Loan Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Loan Product Object
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoanProduct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LoanProduct'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.Status'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a loan product
+      tags:
+      - Loan Product
+  /transactions/installments:
+    post:
+      consumes:
+      - application/json
+      description: Create a new installment transaction
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Installment transaction data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.InstallmentTransactionRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Installment transaction created successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new installment transaction
+      tags:
+      - Installment Transaction
+  /transactions/installments/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve installment transaction details by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Installment transaction details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find installment transaction by ID
+      tags:
+      - Installment Transaction
+  /transactions/installments/midtrans-hook:
+    get:
+      consumes:
+      - application/json
+      description: Handle Midtrans webhook to update installment transaction status
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Order ID
+        in: query
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Installment transaction status updated successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Handle Midtrans webhook for installment transactions
+      tags:
+      - Installment Transaction
+  /transactions/installments/users/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve installment transactions for a specific user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Transaction Date
+        in: query
+        name: trxDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of installment transactions
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find installment transactions by user ID
+      tags:
+      - Installment Transaction
+  /transactions/installments/users/{userId}/{trxId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve installment transaction details by user ID and transaction
+        ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: trxId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Installment transaction details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find installment transaction by user ID and transaction ID
+      tags:
+      - Installment Transaction
+  /transactions/loans:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all loan transactions
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of loan transactions
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all loan transactions
+      tags:
+      - Loan Transaction
+    post:
+      consumes:
+      - application/json
+      description: Create a new loan transaction
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Loan transaction data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoanTransactionRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Loan transaction created successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new loan transaction
+      tags:
+      - Loan Transaction
+  /transactions/loans/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve loan transaction details by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Loan transaction details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Loan transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get loan transaction by ID
+      tags:
+      - Loan Transaction
+  /transactions/loans/users/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve loan transactions for a specific user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of loan transactions
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Loan transactions not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get loan transactions by user ID
+      tags:
+      - Loan Transaction
+  /transactions/loans/users/{userId}/{trxId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve loan transaction details by user ID and transaction ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: trxId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Loan transaction details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Loan transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find loan transaction by user ID and transaction ID
+      tags:
+      - Loan Transaction
+  /transactions/topups:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all topups
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of topups
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all topups
+      tags:
+      - Topup
+    post:
+      consumes:
+      - application/json
+      description: Create a new topup
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Topup data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TopupDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Topup created successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new topup
+      tags:
+      - Topup
+  /transactions/topups/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve topup details by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Topup ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Topup details
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get topup by ID
+      tags:
+      - Topup
+  /transactions/topups/user/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve topups for a specific user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of topups
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get topups by user ID
+      tags:
+      - Topup
+  /transactions/transfers:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all transfers
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of transfers
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all transfers
+      tags:
+      - Transfer
+    post:
+      consumes:
+      - application/json
+      description: Create a new transfer
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Transfer data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TransferDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Transfer created successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new transfer
+      tags:
+      - Transfer
+  /transactions/transfers/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve transfer details by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Transfer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transfer details
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get transfer by ID
+      tags:
+      - Transfer
+  /transactions/transfers/users/{senderId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve transfer details by sender ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Sender ID
+        in: path
+        name: senderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transfer details
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get transfer by sender ID
+      tags:
+      - Transfer
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all users
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Register a new user and create profile and address
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User profile data
+        in: formData
+        name: profile
+        required: true
+        type: string
+      - description: User address data
+        in: formData
+        name: address
+        required: true
+        type: string
+      - description: User profile photo
+        in: formData
+        name: photo
+        required: true
+        type: file
+      - description: User ID card photo
+        in: formData
+        name: idCard
+        required: true
+        type: file
+      - description: User salary slip
+        in: formData
+        name: salarySlip
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create user profile and address
+      tags:
+      - User
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user by ID
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Retrieve user by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get user by ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user status by ID
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User status updated successfully
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update user status
+      tags:
+      - User
+  /users/status/{status}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve users based on status
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User status
+        in: path
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get users by status
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    description: Bearer <token>
+    in: header
+    name: Authorization
+    scopes:
+      write: Grants write acces
+    type: apiKey
 swagger: "2.0"

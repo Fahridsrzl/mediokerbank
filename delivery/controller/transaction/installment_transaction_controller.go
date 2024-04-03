@@ -17,6 +17,19 @@ type InstallmentTransactionController struct {
 	jwt middleware.AuthMiddleware
 }
 
+// createTrxHandler handles creating a new installment transaction
+// @Summary Create a new installment transaction
+// @Description Create a new installment transaction
+// @Tags Installment Transaction
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param body body dto.InstallmentTransactionRequestDto true "Installment transaction data"
+// @Success 201 {string} string "Installment transaction created successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/installments [post]
 func (i *InstallmentTransactionController) createTrxHandler(ctx *gin.Context) {
 	var payload dto.InstallmentTransactionRequestDto
 	err := ctx.ShouldBindJSON(&payload)
@@ -32,6 +45,19 @@ func (i *InstallmentTransactionController) createTrxHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
+// findTrxByIdHandler handles finding an installment transaction by ID
+// @Summary Find installment transaction by ID
+// @Description Retrieve installment transaction details by ID
+// @Tags Installment Transaction
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "Transaction ID"
+// @Success 200 {object} map[string]interface{} "Installment transaction details"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/installments/{id} [get]
 func (i *InstallmentTransactionController) findTrxByIdHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	response, err := i.uc.FindTrxById(id)
@@ -42,6 +68,19 @@ func (i *InstallmentTransactionController) findTrxByIdHandler(ctx *gin.Context) 
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
+// findTrxByIdHandler handles finding an installment transaction by ID
+// @Summary Find installment transaction by ID
+// @Description Retrieve installment transaction details by ID
+// @Tags Installment Transaction
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param id path string true "Transaction ID"
+// @Success 200 {object} map[string]interface{} "Installment transaction details"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/installments/{id} [get]
 func (i *InstallmentTransactionController) findTrxManyHandler(ctx *gin.Context) {
 	payload := dto.InstallmentTransactionSearchDto{
 		TrxDate: ctx.Query("trxDate"),
@@ -54,6 +93,20 @@ func (i *InstallmentTransactionController) findTrxManyHandler(ctx *gin.Context) 
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
+// findTrxByUserIdHandler handles finding installment transactions by user ID
+// @Summary Find installment transactions by user ID
+// @Description Retrieve installment transactions for a specific user
+// @Tags Installment Transaction
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param userId path string true "User ID"
+// @Param trxDate query string false "Transaction Date"
+// @Success 200 {object} map[string]interface{} "List of installment transactions"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/installments/users/{userId} [get]
 func (i *InstallmentTransactionController) findTrxByUserIdHandler(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 	payload := dto.InstallmentTransactionSearchDto{
@@ -67,6 +120,20 @@ func (i *InstallmentTransactionController) findTrxByUserIdHandler(ctx *gin.Conte
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
+// findTrxByUserIdAndTrxIdHandler handles finding an installment transaction by user ID and transaction ID
+// @Summary Find installment transaction by user ID and transaction ID
+// @Description Retrieve installment transaction details by user ID and transaction ID
+// @Tags Installment Transaction
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param userId path string true "User ID"
+// @Param trxId path string true "Transaction ID"
+// @Success 200 {object} map[string]interface{} "Installment transaction details"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/installments/users/{userId}/{trxId} [get]
 func (i *InstallmentTransactionController) findTrxByUserIdAndTrxIdHandler(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 	trxId := ctx.Param("trxId")
@@ -78,6 +145,20 @@ func (i *InstallmentTransactionController) findTrxByUserIdAndTrxIdHandler(ctx *g
 	common.SendSingleResponse(ctx, "Success", response)
 }
 
+
+// midtransHookHandler handles the Midtrans webhook for installment transactions
+// @Summary Handle Midtrans webhook for installment transactions
+// @Description Handle Midtrans webhook to update installment transaction status
+// @Tags Installment Transaction
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Accept json
+// @Produce json
+// @Param order_id query string true "Order ID"
+// @Success 200 {string} string "Installment transaction status updated successfully"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/installments/midtrans-hook [get]
 func (i *InstallmentTransactionController) midtransHookHandler(ctx *gin.Context) {
 	id := ctx.Query("order_id")
 	err := i.uc.UpdateTrxById(id)

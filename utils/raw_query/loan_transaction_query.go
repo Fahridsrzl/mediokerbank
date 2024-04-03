@@ -1,8 +1,8 @@
 package rawquery
 
 const (
-	CreateLoanTransaction = `INSERT INTO loan_transactions ( trx_date, user_id, status)
-	VALUES ($1, $2, $3)
+	CreateLoanTransaction = `INSERT INTO loan_transactions ( user_id, status)
+	VALUES ($1, $2)
 	RETURNING *;`
 	CreateLoanTransactionDetail = `INSERT INTO loan_transaction_details (product_id, amount, purpose, interest, installment_period, installment_unit, installment_amount, trx_id)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
