@@ -37,7 +37,7 @@ func TestAuthUsecaseTestSuite(t *testing.T) {
 func (suite *AuthUseCaseTestSuite) TestingRegisterUser_Success() {
 	payloadMock := dto.AuthRegisterDto{
 		Username:        "maman",
-		Email:           "mamanabdurrahman@gmail.com",
+		Email:           "mamanabdurrahman@gmail.comjkjbkjkjn",
 		Password:        "123456",
 		ConfirmPassword: "123456",
 	}

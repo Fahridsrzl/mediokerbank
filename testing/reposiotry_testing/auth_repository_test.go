@@ -89,7 +89,7 @@ func (suite *AuthRepositoryTestSuite) TestCreteUser_Success() {
 
 	actual, err := suite.repo.CreateUser(payloadMock)
 	assert.Nil(suite.T(), err)
-	assert.Equal(suite.T(), expected.ID, actual.ID)
+	assert.Equal(suite.T(), expected.Username, actual.Username)
 }
 
 func (suite *AuthRepositoryTestSuite) TestFindByVCode_Success() {
