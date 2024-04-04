@@ -2,7 +2,7 @@ version: "3.8"
 services:
   backend:
     build:
-      dockerfile: Dockerfile
+      dockerfile: DOCKERFILE
     env_file:
       - .env
     container_name: product-be
