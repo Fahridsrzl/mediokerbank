@@ -12,4 +12,5 @@ FROM alpine
 WORKDIR /app
 # karena diatas as buil maka fromnya from build, kalau diatas as tokonyadia maka dibawah from tokonyadia
 COPY --from=build /app/medioker-bank /app/medioker-bank
+COPY --from=build /app/.env /app/.env
 ENTRYPOINT [ "/app/medioker-bank" ]

@@ -26,7 +26,7 @@ services:
       - MAILER_PASSWORD=${MAILER_PASSWORD}
       - MIDTRANS_SERVER_KEY=${MIDTRANS_SERVER_KEY}
     ports:
-      - "${API_PORT}:8080"
+      - "8081:8080"
     networks:
       - product-network
   db:
@@ -37,7 +37,7 @@ services:
       - POSTGRES_PASSWORD=123456
     restart: always
     ports:
-      - ${DB_PORT}:5432
+      - 5433:5432
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
