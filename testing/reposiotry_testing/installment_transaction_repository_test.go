@@ -147,7 +147,9 @@ func (suite *InstallmentTransactionRepositoryTestSuite) TestFindAll_Success() {
 	)
 	suite.mockSql.ExpectQuery("SELECT (.+) installment_transaction_details").WillReturnRows(tableTrxd)
 
-	_, err := suite.repo.FindAll()
+	pageMock := 1
+	limitMock := 1
+	_, err := suite.repo.FindAll(pageMock, limitMock)
 	assert.Nil(suite.T(), err)
 }
 
@@ -187,7 +189,9 @@ func (suite *InstallmentTransactionRepositoryTestSuite) TestFindMany_Success() {
 	)
 	suite.mockSql.ExpectQuery("SELECT (.+) installment_transaction_details").WillReturnRows(tableTrxd)
 
-	actual, err := suite.repo.FindMany(payloadMock)
+	pageMock := 1
+	limitMock := 1
+	actual, err := suite.repo.FindMany(payloadMock, pageMock, limitMock)
 	assert.Nil(suite.T(), err)
 	notfound := false
 	for _, item := range actual {

@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	"medioker-bank/model"
+	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
 )
 
 type LoanTransactionRepository interface {
-	GetAll(page, limit int) ([]model.LoanTransaction, error)
-	GetByID(id string) (model.LoanTransaction, error)
-	GetByUserID(UserId string) (model.LoanTransaction, error)
-	GetByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error)
+	GetAll(page, limit int) ([]dto.LoanTransactionResponseDto, error)
+	GetByID(id string) (dto.LoanTransactionResponseDto, error)
+	GetByUserID(userId string) ([]dto.LoanTransactionResponseDto, error)
+	GetByUserIdAndTrxId(userId, trxId string) (dto.LoanTransactionResponseDto, error)
 	Create(payload model.LoanTransaction) (model.LoanTransaction, error)
 }
 
@@ -19,66 +20,70 @@ type loanTransaction struct {
 	db *sql.DB
 }
 
-func (l *loanTransaction) GetByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error) {
+func (l *loanTransaction) GetByUserIdAndTrxId(userId, trxId string) (dto.LoanTransactionResponseDto, error) {
 	var loanTransactions []model.LoanTransaction
 
 	query := rawquery.GetLoanTransactionByUserIdAndTrxId
-	rows, err := l.db.Query(query, userId, trxId)
+	row := l.db.QueryRow(query, userId, trxId)
+
+	var user model.User
+	var loanTransactionDetail model.LoanTransactionDetail
+	var loanProduct model.LoanProduct
+	var loanTransaction model.LoanTransaction
+
+	err := row.Scan(
+		&loanTransaction.Id,
+		&loanTransaction.TrxDate,
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&loanTransaction.Status,
+		&loanTransaction.CreatedAt,
+		&loanTransaction.UpdatedAt,
+		&loanTransactionDetail.Id,
+		&loanProduct.Name,
+		&loanProduct.MaxAmount,
+		&loanProduct.MinInstallmentPeriod,
+		&loanProduct.MaxInstallmentPeriod,
+		&loanProduct.InstallmentPeriodUnit,
+		&loanProduct.AdminFee,
+		&loanProduct.MinCreditScore,
+		&loanProduct.MinMonthlyIncome,
+		&loanProduct.CreatedAt,
+		&loanProduct.UpdatedAt,
+		&loanTransactionDetail.Amount,
+		&loanTransactionDetail.Purpose,
+		&loanTransactionDetail.Interest,
+		&loanTransactionDetail.InstallmentPeriod,
+		&loanTransactionDetail.InstallmentUnit,
+		&loanTransactionDetail.InstallmentAmount,
+		&loanTransactionDetail.CreatedAt,
+		&loanTransactionDetail.UpdatedAt,
+	)
 	if err != nil {
-		return nil, err
+		return dto.LoanTransactionResponseDto{}, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var user model.User
-		var loanTransactionDetail model.LoanTransactionDetail
-		var loanProduct model.LoanProduct
-		var loanTransaction model.LoanTransaction
+	loanTransaction.User = user
+	loanTransactionDetail.LoanProduct = loanProduct
+	loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
+	fmt.Println(loanTransaction)
+	loanTransactions = append(loanTransactions, loanTransaction)
 
-		err := rows.Scan(
-			&loanTransaction.Id,
-			&loanTransaction.TrxDate,
-			&user.ID,
-			&user.Username,
-			&user.Email,
-			&loanTransaction.Status,
-			&loanTransaction.CreatedAt,
-			&loanTransaction.UpdatedAt,
-			&loanTransactionDetail.Id,
-			&loanProduct.Name,
-			&loanProduct.MaxAmount,
-			&loanProduct.MinInstallmentPeriod,
-			&loanProduct.MaxInstallmentPeriod,
-			&loanProduct.InstallmentPeriodUnit,
-			&loanProduct.AdminFee,
-			&loanProduct.MinCreditScore,
-			&loanProduct.MinMonthlyIncome,
-			&loanProduct.CreatedAt,
-			&loanProduct.UpdatedAt,
-			&loanTransactionDetail.Amount,
-			&loanTransactionDetail.Purpose,
-			&loanTransactionDetail.Interest,
-			&loanTransactionDetail.InstallmentPeriod,
-			&loanTransactionDetail.InstallmentUnit,
-			&loanTransactionDetail.InstallmentAmount,
-			&loanTransactionDetail.CreatedAt,
-			&loanTransactionDetail.UpdatedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		loanTransaction.User = user
-		loanTransactionDetail.LoanProduct = loanProduct
-		loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
-		fmt.Println(loanTransaction)
-		loanTransactions = append(loanTransactions, loanTransaction)
+	result := dto.LoanTransactionResponseDto{
+		Id:                      loanTransaction.Id,
+		TrxDate:                 loanTransaction.TrxDate,
+		UserId:                  loanTransaction.User.ID,
+		LoanTransactionDetaills: loanTransaction.LoanTransactionDetaills,
+		Status:                  loanTransaction.Status,
+		CreatedAt:               loanTransaction.CreatedAt,
+		UpdatedAt:               loanTransaction.UpdatedAt,
 	}
-	return loanTransactions, nil
+	return result, nil
 }
 
-func (l *loanTransaction) GetAll(page, limit int) ([]model.LoanTransaction, error) {
-	var loanTransactions []model.LoanTransaction
+func (l *loanTransaction) GetAll(page, limit int) ([]dto.LoanTransactionResponseDto, error) {
+	var results []dto.LoanTransactionResponseDto
 
 	offset := (page - 1) * limit
 	query := rawquery.GetAllLoanTransaction
@@ -130,63 +135,91 @@ func (l *loanTransaction) GetAll(page, limit int) ([]model.LoanTransaction, erro
 		loanTransaction.User = user
 		loanTransactionDetail.LoanProduct = loanProduct
 		loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
-		fmt.Println(loanTransaction)
-		loanTransactions = append(loanTransactions, loanTransaction)
+
+		result := dto.LoanTransactionResponseDto{
+			Id:                      loanTransaction.Id,
+			TrxDate:                 loanTransaction.TrxDate,
+			UserId:                  loanTransaction.User.ID,
+			LoanTransactionDetaills: loanTransaction.LoanTransactionDetaills,
+			Status:                  loanTransaction.Status,
+			CreatedAt:               loanTransaction.CreatedAt,
+			UpdatedAt:               loanTransaction.UpdatedAt,
+		}
+		results = append(results, result)
 	}
-	return loanTransactions, nil
+	return results, nil
 }
 
-func (l *loanTransaction) GetByUserID(userId string) (model.LoanTransaction, error) {
-	var loanTransaction model.LoanTransaction
+func (l *loanTransaction) GetByUserID(userId string) ([]dto.LoanTransactionResponseDto, error) {
+	var results []dto.LoanTransactionResponseDto
 
 	query := rawquery.GetLoanTransactionByUserId
-	row := l.db.QueryRow(query, userId)
-
-	var user model.User
-	var loanTransactionDetail model.LoanTransactionDetail
-	var loanProduct model.LoanProduct
-
-	err := row.Scan(
-		&loanTransaction.Id,
-		&loanTransaction.TrxDate,
-		&user.ID,
-		&user.Username,
-		&user.Email,
-		&loanTransaction.Status,
-		&loanTransaction.CreatedAt,
-		&loanTransaction.UpdatedAt,
-		&loanTransactionDetail.Id,
-		&loanProduct.Name,
-		&loanProduct.MaxAmount,
-		&loanProduct.MinInstallmentPeriod,
-		&loanProduct.MaxInstallmentPeriod,
-		&loanProduct.InstallmentPeriodUnit,
-		&loanProduct.AdminFee,
-		&loanProduct.MinCreditScore,
-		&loanProduct.MinMonthlyIncome,
-		&loanProduct.CreatedAt,
-		&loanProduct.UpdatedAt,
-		&loanTransactionDetail.Amount,
-		&loanTransactionDetail.Purpose,
-		&loanTransactionDetail.Interest,
-		&loanTransactionDetail.InstallmentPeriod,
-		&loanTransactionDetail.InstallmentUnit,
-		&loanTransactionDetail.InstallmentAmount,
-		&loanTransactionDetail.CreatedAt,
-		&loanTransactionDetail.UpdatedAt,
-	)
+	rows, err := l.db.Query(query, userId)
 	if err != nil {
-		return model.LoanTransaction{}, err
+		return []dto.LoanTransactionResponseDto{}, err
 	}
 
-	loanTransaction.User = user
-	loanTransactionDetail.LoanProduct = loanProduct
-	loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
+	for rows.Next() {
+		var loanTransaction model.LoanTransaction
+		var user model.User
+		var loanTransactionDetail model.LoanTransactionDetail
+		var loanProduct model.LoanProduct
 
-	return loanTransaction, nil
+		err := rows.Scan(
+			&loanTransaction.Id,
+			&loanTransaction.TrxDate,
+			&user.ID,
+			&user.Username,
+			&user.Email,
+			&loanTransaction.Status,
+			&loanTransaction.CreatedAt,
+			&loanTransaction.UpdatedAt,
+			&loanTransactionDetail.Id,
+			&loanProduct.Id,
+			&loanProduct.Name,
+			&loanProduct.MaxAmount,
+			&loanProduct.MinInstallmentPeriod,
+			&loanProduct.MaxInstallmentPeriod,
+			&loanProduct.InstallmentPeriodUnit,
+			&loanProduct.AdminFee,
+			&loanProduct.MinCreditScore,
+			&loanProduct.MinMonthlyIncome,
+			&loanProduct.CreatedAt,
+			&loanProduct.UpdatedAt,
+			&loanTransactionDetail.Amount,
+			&loanTransactionDetail.Purpose,
+			&loanTransactionDetail.Interest,
+			&loanTransactionDetail.InstallmentPeriod,
+			&loanTransactionDetail.InstallmentUnit,
+			&loanTransactionDetail.InstallmentAmount,
+			&loanTransactionDetail.CreatedAt,
+			&loanTransactionDetail.UpdatedAt,
+		)
+		if err != nil {
+			return []dto.LoanTransactionResponseDto{}, err
+		}
+
+		loanTransaction.User = user
+		loanTransactionDetail.LoanProduct = loanProduct
+		loanTransactionDetail.TrxId = loanTransaction.Id
+		loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
+
+		result := dto.LoanTransactionResponseDto{
+			Id:                      loanTransaction.Id,
+			TrxDate:                 loanTransaction.TrxDate,
+			UserId:                  loanTransaction.User.ID,
+			LoanTransactionDetaills: loanTransaction.LoanTransactionDetaills,
+			Status:                  loanTransaction.Status,
+			CreatedAt:               loanTransaction.CreatedAt,
+			UpdatedAt:               loanTransaction.UpdatedAt,
+		}
+		results = append(results, result)
+	}
+
+	return results, nil
 }
 
-func (l *loanTransaction) GetByID(id string) (model.LoanTransaction, error) {
+func (l *loanTransaction) GetByID(id string) (dto.LoanTransactionResponseDto, error) {
 	var loanTransaction model.LoanTransaction
 
 	query := rawquery.GetLoanTransactionById
@@ -206,6 +239,7 @@ func (l *loanTransaction) GetByID(id string) (model.LoanTransaction, error) {
 		&loanTransaction.CreatedAt,
 		&loanTransaction.UpdatedAt,
 		&loanTransactionDetail.Id,
+		&loanProduct.Id,
 		&loanProduct.Name,
 		&loanProduct.MaxAmount,
 		&loanProduct.MinInstallmentPeriod,
@@ -226,14 +260,25 @@ func (l *loanTransaction) GetByID(id string) (model.LoanTransaction, error) {
 		&loanTransactionDetail.UpdatedAt,
 	)
 	if err != nil {
-		return model.LoanTransaction{}, err
+		return dto.LoanTransactionResponseDto{}, err
 	}
 
 	loanTransaction.User = user
 	loanTransactionDetail.LoanProduct = loanProduct
+	loanTransactionDetail.TrxId = loanTransaction.Id
 	loanTransaction.LoanTransactionDetaills = append(loanTransaction.LoanTransactionDetaills, loanTransactionDetail)
 
-	return loanTransaction, nil
+	result := dto.LoanTransactionResponseDto{
+		Id:                      loanTransaction.Id,
+		TrxDate:                 loanTransaction.TrxDate,
+		UserId:                  loanTransaction.User.ID,
+		LoanTransactionDetaills: loanTransaction.LoanTransactionDetaills,
+		Status:                  loanTransaction.Status,
+		CreatedAt:               loanTransaction.CreatedAt,
+		UpdatedAt:               loanTransaction.UpdatedAt,
+	}
+
+	return result, nil
 }
 
 func (l *loanTransaction) Create(payload model.LoanTransaction) (model.LoanTransaction, error) {

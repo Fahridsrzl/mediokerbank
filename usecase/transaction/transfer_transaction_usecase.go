@@ -33,6 +33,9 @@ func (u *transferUseCase) CreateTransfer(transferDto dto.TransferDto) (model.Tra
 	if sender.Status != "verified" || receiver.Status != "verified" {
 		return model.TransferTransaction{}, errors.New("sender or receiver unverified")
 	}
+	if transferDto.Amount < 10000 {
+		return model.TransferTransaction{}, errors.New("if you don't have money, work harder, min amount 10000")
+	}
 	if sender.Balance < transferDto.Amount {
 		return model.TransferTransaction{}, errors.New("too low sender balance")
 	}

@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"medioker-bank/model"
 	"medioker-bank/model/dto"
 	rawquery "medioker-bank/utils/raw_query"
@@ -206,6 +205,12 @@ func (u *userRepository) GetUserByID(id string) (model.User, error) {
 		&user.Balance,
 		&user.CreatedAt,
 		&user.UpdatedAt,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	err = u.db.QueryRow(rawquery.GetProfile, user.ID).Scan(
 		&profile.ID,
 		&profile.FirstName,
 		&profile.LastName,
@@ -225,24 +230,31 @@ func (u *userRepository) GetUserByID(id string) (model.User, error) {
 		&profile.UserID,
 		&profile.CreatedAt,
 		&profile.UpdatedAt,
-		&address.ID,
-		&address.AddressLine,
-		&address.City,
-		&address.Province,
-		&address.PostalCode,
-		&address.Country,
-		&address.ProfileID,
-		&address.CreatedAt,
-		&address.UpdatedAt,
 	)
-	if err != nil {
-		return model.User{}, err
+	if err != nil && err != sql.ErrNoRows {
+		return model.User{}, errors.New("get profile: " + err.Error())
+	}
+
+	if profile.ID != "" {
+		err = u.db.QueryRow(rawquery.GetAddress, profile.ID).Scan(
+			&address.ID,
+			&address.AddressLine,
+			&address.City,
+			&address.Province,
+			&address.PostalCode,
+			&address.Country,
+			&address.ProfileID,
+			&address.CreatedAt,
+			&address.UpdatedAt,
+		)
+		if err != nil && err != sql.ErrNoRows {
+			return model.User{}, errors.New("get address: " + err.Error())
+		}
 	}
 
 	user.Profile = profile
 	user.Profile.Address = address
 
-	fmt.Println(user)
 	return user, nil
 }
 

@@ -113,9 +113,11 @@ func (suite *UserUseCaseTestSuite) TestGetAllUser_Success() {
 		{ID: "1"},
 	}
 
-	suite.urm.Mock.On("GetAllUsers", mock.Anything).Return(expected, nil)
+	suite.urm.Mock.On("GetAllUsers", mock.Anything, mock.Anything).Return(expected, nil)
 
-	actual, err := suite.uu.GetAllUser()
+	pageMock := 1
+	limitMock := 1
+	actual, err := suite.uu.GetAllUser(pageMock, limitMock)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), len(expected), len(actual))
 }

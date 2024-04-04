@@ -37,32 +37,6 @@ func TestUserControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(UserControllerTestSuite))
 }
 
-// func (suite *UserControllerTestSuite) TestCreateHandler_Success() {
-// 	suite.uum.Mock.On("CreateProfileAndAddressThenUpdateUser", mock.Anything).Return(model.Profile{}, model.Address{}, nil)
-// 	profile := dto.ProfileCreateDto{}
-// 	address := dto.AddressCreateDto{}
-// 	profileJson, _ := json.Marshal(profile)
-// 	addressJson, _ := json.Marshal(address)
-// 	body := &bytes.Buffer{}
-// 	writer := multipart.NewWriter(body)
-// 	_ = writer.WriteField("profile", string(profileJson))
-// 	_ = writer.WriteField("address", string(addressJson))
-// 	photo, _ := writer.CreateFormFile("photo", "photo.jpg")
-// 	idCard, _ := writer.CreateFormFile("idCard", "id-card.jpg")
-// 	salary, _ := writer.CreateFormFile("salarySlip", "salary.jpg")
-// 	_, _ = photo.Write([]byte{})
-// 	_, _ = idCard.Write([]byte{})
-// 	_, _ = salary.Write([]byte{})
-// 	suite.controller.Router()
-// 	record := httptest.NewRecorder()
-// 	req, err := http.NewRequest(http.MethodPost, "/api/v1/users", body)
-// 	assert.NoError(suite.T(), err)
-// 	ctx, _ := gin.CreateTestContext(record)
-// 	ctx.Request = req
-// 	suite.controller.CreateHandler(ctx)
-// 	assert.Equal(suite.T(), http.StatusCreated, record.Code)
-// }
-
 func (suite *UserControllerTestSuite) TestGetStatusHandler_Success() {
 	suite.uum.Mock.On("FindByStatus", mock.Anything).Return([]dto.ResponseStatus{}, nil)
 	suite.controller.Router()
@@ -80,10 +54,10 @@ func (suite *UserControllerTestSuite) TestGetidHandler_Success() {
 }
 
 func (suite *UserControllerTestSuite) TestGetAllUserHandler_Success() {
-	suite.uum.Mock.On("GetAllUser", mock.Anything).Return([]dto.UserDto{}, nil)
+	suite.uum.Mock.On("GetAllUser", mock.Anything, mock.Anything).Return([]dto.UserDto{}, nil)
 	suite.controller.Router()
 	record := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/api/v1/users/", bytes.NewBuffer([]byte{}))
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/users?page=1&limit=1", bytes.NewBuffer([]byte{}))
 	assert.NoError(suite.T(), err)
 	ctx, _ := gin.CreateTestContext(record)
 	ctx.Request = req

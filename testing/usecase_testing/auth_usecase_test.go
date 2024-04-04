@@ -34,7 +34,7 @@ func TestAuthUsecaseTestSuite(t *testing.T) {
 	suite.Run(t, new(AuthUseCaseTestSuite))
 }
 
-func (suite *AuthUseCaseTestSuite) TestingRegisterUser_Success() {
+func (suite *AuthUseCaseTestSuite) TestRegisterUser_Success() {
 	payloadMock := dto.AuthRegisterDto{
 		Username:        "maman",
 		Email:           "mamanabdurrahman@gmail.comjkjbkjkjn",
@@ -53,7 +53,7 @@ func (suite *AuthUseCaseTestSuite) TestingRegisterUser_Success() {
 	assert.Equal(suite.T(), expectedReturn, actual)
 }
 
-func (suite *AuthUseCaseTestSuite) TestingVerifyUser_Success() {
+func (suite *AuthUseCaseTestSuite) TestVerifyUser_Success() {
 	vCodeMock := 000000
 	suite.arm.Mock.On("FindByVCode", mock.Anything).Return(dto.AuthVerifyDto{}, nil)
 	suite.arm.Mock.On("CreateUser", mock.Anything).Return(model.User{}, nil)
@@ -64,7 +64,7 @@ func (suite *AuthUseCaseTestSuite) TestingVerifyUser_Success() {
 	assert.Equal(suite.T(), model.User{}, actual)
 }
 
-func (suite *AuthUseCaseTestSuite) TestingLoginUser_Success() {
+func (suite *AuthUseCaseTestSuite) TestLoginUser_Success() {
 	payloadMock := dto.AuthLoginDto{
 		Email:    "mamanabdurrahman@gmail.com",
 		Password: "123456",
@@ -89,7 +89,7 @@ func (suite *AuthUseCaseTestSuite) TestingLoginUser_Success() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
-func (suite *AuthUseCaseTestSuite) TestingLoginAdmin_Success() {
+func (suite *AuthUseCaseTestSuite) TestLoginAdmin_Success() {
 	payloadMock := dto.AuthLoginDto{
 		Username: "admin",
 		Password: "123456",

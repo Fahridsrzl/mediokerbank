@@ -15,53 +15,11 @@ const (
 
 	GetUserByStatus = `SELECT id,username,email,role, status, credit_score, balance,created_at,updated_at FROM users WHERE status = $1`
 
-	GetUserById = `SELECT
-    u.id,
-    u.username,
-    u.email,
-    u.password,
-    u.role,
-    u.status,
-    u.credit_score,
-    u.balance,
-    u.created_at,
-    u.updated_at,
-    p.id,
-    p.first_name,
-    p.last_name,
-    p.citizenship,
-    p.national_id,
-    p.birth_place,
-    p.birth_date,
-    p.gender,
-    p.marital_status,
-    p.occupation,
-    p.monthly_income,
-    p.phone_number,
-    p.urgent_phone_number,
-    p.photo,
-    p.id_card,
-    p.salary_slip,
-    p.user_id,
-    p.created_at,
-    p.updated_at,
-    a.id,
-    a.address_line,
-    a.city,
-    a.province,
-    a.postal_code,
-    a.country,
-    a.profile_id,
-    a.created_at,
-    a.updated_at
-FROM
-    users u
-JOIN
-    profiles p ON u.id = p.user_id
-JOIN
-    addresses a ON p.id = a.profile_id
-WHERE
-    u.id = $1`
+	GetUserById = `SELECT * FROM users WHERE id = $1`
+
+	GetProfile = `SELECT * FROM profiles WHERE user_id = $1`
+
+	GetAddress = `SELECT * FROM addresses WHERE profile_id = $1`
 
 	DeleteUser = `DELETE FROM users WHERE id = $1`
 

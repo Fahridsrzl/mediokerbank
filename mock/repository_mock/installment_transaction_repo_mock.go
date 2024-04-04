@@ -21,13 +21,13 @@ func (i *InstallmentTransactionRepoMock) FindById(id string) (model.InstallmentT
 	return args.Get(0).(model.InstallmentTransaction), args.Error(1)
 }
 
-func (i *InstallmentTransactionRepoMock) FindAll() ([]model.InstallmentTransaction, error) {
-	args := i.Called()
+func (i *InstallmentTransactionRepoMock) FindAll(page, limit int) ([]model.InstallmentTransaction, error) {
+	args := i.Called(page, limit)
 	return args.Get(0).([]model.InstallmentTransaction), args.Error(1)
 }
 
-func (i *InstallmentTransactionRepoMock) FindMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error) {
-	args := i.Called(payload)
+func (i *InstallmentTransactionRepoMock) FindMany(payload dto.InstallmentTransactionSearchDto, page, limit int) ([]model.InstallmentTransaction, error) {
+	args := i.Called(payload, page, limit)
 	return args.Get(0).([]model.InstallmentTransaction), args.Error(1)
 }
 

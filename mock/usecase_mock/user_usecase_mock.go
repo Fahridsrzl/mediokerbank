@@ -36,8 +36,8 @@ func (u *UserUseCaseMock) RemoveUser(id string) (model.User, error) {
 	return args.Get(0).(model.User), args.Error(1)
 }
 
-func (u *UserUseCaseMock) GetAllUser() ([]dto.UserDto, error) {
-	args := u.Called()
+func (u *UserUseCaseMock) GetAllUser(page, limit int) ([]dto.UserDto, error) {
+	args := u.Called(page, limit)
 	return args.Get(0).([]dto.UserDto), args.Error(1)
 }
 

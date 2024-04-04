@@ -190,7 +190,7 @@ func (i *InstallmentTransactionController) Router() {
 	installmentGroup := i.rg.Group(appconfig.InstallmentGroup)
 	{
 		installmentGroup.POST(appconfig.InstallmentCreate, i.jwt.RequireToken("user"), i.CreateTrxHandler)
-		installmentGroup.GET(appconfig.InstallmentFindTrxById, i.jwt.RequireToken("admin"), i.FindTrxByIdHandler)
+		installmentGroup.GET(appconfig.InstallmentFindTrxById, i.jwt.RequireToken("admin", "user"), i.FindTrxByIdHandler)
 		installmentGroup.GET(appconfig.InstallmentFindTrxMany, i.jwt.RequireToken("admin"), i.FindTrxManyHandler)
 		installmentGroup.GET(appconfig.InstallmentFindTrxByUserId, i.jwt.RequireToken("user"), i.FindTrxByUserIdHandler)
 		installmentGroup.GET(appconfig.InstallmentFindTrxByUserAndTrxId, i.jwt.RequireToken("user"), i.FindTrxByUserIdAndTrxIdHandler)

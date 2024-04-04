@@ -349,7 +349,9 @@ func (suite *UserRepositoryTestSuite) TestGetAllUsers_Success() {
 	suite.mockSql.ExpectQuery(`SELECT id, username, email, role, status, credit_score, balance, created_at, updated_at
 	FROM users`).WillReturnRows(table)
 
-	actual, err := suite.repo.GetAllUsers()
+	pageMock := 1
+	limitMock := 1
+	actual, err := suite.repo.GetAllUsers(pageMock, limitMock)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), users, actual)
 }

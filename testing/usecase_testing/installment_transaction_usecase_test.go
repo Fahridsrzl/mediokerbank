@@ -37,40 +37,6 @@ func TestInstallmentUseCaseTestSuite(t *testing.T) {
 	suite.Run(t, new(InstallmentTransactionUseCaseTestSuite))
 }
 
-// func (suite *InstallmentTransactionUseCaseTestSuite) TestCreateTrx_Success() {
-// 	payloadMock := dto.InstallmentTransactionRequestDto{
-// 		UserId:        "1",
-// 		PaymentMethod: "medioker balance",
-// 	}
-// 	loanMock := model.Loan{
-// 		Id: "1",
-// 		LoanProduct: model.LoanProduct{
-// 			Id: "1",
-// 		},
-// 		PeriodLeft: 5,
-// 	}
-// 	userMock := model.User{
-// 		ID: "1",
-// 	}
-// 	trxMock := model.InstallmentTransaction{}
-// 	responseMock := dto.InstallmentTransactionResponseDto{
-// 		Message:     "transaction success, your loan updated",
-// 		PaymentLink: "-",
-// 		Transaction: trxMock,
-// 	}
-
-// 	suite.lrm.Mock.On("FindByUserId", payloadMock.UserId).Return([]model.Loan{}, nil)
-// 	suite.pum.Mock.On("FindLoanProductById", mock.Anything).Return(loanMock.LoanProduct, nil)
-// 	suite.uum.Mock.On("GetUserByID", mock.Anything).Return(userMock, nil)
-// 	suite.irm.Mock.On("Create", mock.Anything).Return(trxMock, nil)
-// 	suite.lrm.Mock.On("UpdatePeriod", mock.Anything).Return(nil)
-// 	suite.uum.Mock.On("UpdateUserBalance", mock.Anything).Return(0, nil)
-
-// 	actual, err := suite.iu.CreateTrx(payloadMock)
-// 	assert.Nil(suite.T(), err)
-// 	assert.Equal(suite.T(), responseMock, actual)
-// }
-
 func (suite *InstallmentTransactionUseCaseTestSuite) TestFindTrxById_Success() {
 	idMock := "1"
 	trxMock := model.InstallmentTransaction{
@@ -106,11 +72,13 @@ func (suite *InstallmentTransactionUseCaseTestSuite) TestFindTrxMany_Success() {
 		}},
 	}
 
-	suite.irm.Mock.On("FindAll", mock.Anything).Return(trxsMock, nil)
+	suite.irm.Mock.On("FindAll", mock.Anything, mock.Anything, mock.Anything).Return(trxsMock, nil)
 	suite.lrm.Mock.On("FindByUserId", mock.Anything).Return(loansMock, nil)
 	suite.pum.Mock.On("FindLoanProductById", mock.Anything).Return(model.LoanProduct{}, nil)
 
-	actual, err := suite.iu.FindTrxMany(payloadMock)
+	pageMock := 1
+	limitMock := 1
+	actual, err := suite.iu.FindTrxMany(payloadMock, pageMock, limitMock)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), len(trxsMock), len(actual))
 }

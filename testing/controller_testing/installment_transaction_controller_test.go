@@ -70,10 +70,10 @@ func (suite *InstallmentTransactionControllerTestSuite) TestFindTrxById_Success(
 }
 
 func (suite *InstallmentTransactionControllerTestSuite) TestFindTrxManyhandler_Success() {
-	suite.ium.Mock.On("FindTrxMany", mock.Anything).Return([]model.InstallmentTransaction{}, nil)
+	suite.ium.Mock.On("FindTrxMany", mock.Anything, mock.Anything, mock.Anything).Return([]model.InstallmentTransaction{}, nil)
 	suite.controller.Router()
 	record := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodGet, "/api/v1/transactions/installments/", bytes.NewBuffer([]byte{}))
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/transactions/installments?page=1&limit=1", bytes.NewBuffer([]byte{}))
 	assert.NoError(suite.T(), err)
 	ctx, _ := gin.CreateTestContext(record)
 	ctx.Request = req

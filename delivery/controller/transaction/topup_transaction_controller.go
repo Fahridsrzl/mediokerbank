@@ -38,6 +38,11 @@ func (t *TopupController) CreateHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+	userId := ctx.MustGet("id")
+	if userId != payload.UserID {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, errors.New("forbidden action, You should make transactions on your own account").Error())
+		return
+	}
 	respPayload, err := t.tc.CreateTopup(payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -130,7 +135,7 @@ func (u *TopupController) GetAllTopupHandler(ctx *gin.Context) {
 	}
 
 	// Set response headers and send JSON data
-	ctx.JSON(http.StatusOK, topups)
+	common.SendSingleResponse(ctx, "Success", topups)
 }
 
 func (t *TopupController) Router() {
@@ -138,7 +143,7 @@ func (t *TopupController) Router() {
 	{
 		ur.POST(appconfig.Topup, t.jwt.RequireToken("user"), t.CreateHandler)
 		ur.GET(appconfig.Topup, t.jwt.RequireToken("admin"), t.GetAllTopupHandler)
-		ur.GET(appconfig.TopupId, t.jwt.RequireToken("admin"), t.GetTopupIdHandler)
+		ur.GET(appconfig.TopupId, t.jwt.RequireToken("admin", "user"), t.GetTopupIdHandler)
 		ur.GET(appconfig.TopupUser, t.jwt.RequireToken("user"), t.GetTopupUserIdHandler)
 	}
 }

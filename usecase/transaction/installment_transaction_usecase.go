@@ -43,19 +43,23 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		return dto.InstallmentTransactionResponseDto{}, err
 	}
 	if len(loans) == 0 {
-		return dto.InstallmentTransactionResponseDto{}, errors.New("loan id not found")
+		return dto.InstallmentTransactionResponseDto{}, errors.New("you don't have any loans")
 	}
 	var loan model.Loan
+	match := false
 	for _, item := range loans {
-		if item.Id != payload.LoanId {
-			return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
-		} else {
+		if item.Id == payload.LoanId {
+			match = true
 			loan = item
 		}
 	}
+	if !match {
+		return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
+	}
+
 	loanProduct, err := i.productUc.FindLoanProductById(loan.LoanProduct.Id)
 	if err != nil {
-		return dto.InstallmentTransactionResponseDto{}, err
+		return dto.InstallmentTransactionResponseDto{}, errors.New("loanproduct: " + err.Error())
 	}
 	loan.LoanProduct = loanProduct
 	trxd := model.InstallmentTransactionDetail{
@@ -131,13 +135,17 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 		return dto.InstallmentTransactionResponseDto{}, err
 	}
 	var newLoan model.Loan
+	newMatch := false
 	for _, item := range newLoans {
-		if item.Id != payload.LoanId {
-			return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
-		} else {
+		if item.Id == payload.LoanId {
+			newMatch = true
 			newLoan = item
 		}
 	}
+	if !newMatch {
+		return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
+	}
+
 	if newLoan.PeriodLeft == 0 {
 		err := i.loan.Delete(newLoan.Id)
 		if err != nil {

@@ -15,8 +15,8 @@ func (l *LoanProductMock) FindLoanProductById(id string) (model.LoanProduct, err
 	return args.Get(0).(model.LoanProduct), args.Error(1)
 }
 
-func (l *LoanProductMock) FindAllLoanProduct() ([]model.LoanProduct, error) {
-	args := l.Called()
+func (l *LoanProductMock) FindAllLoanProduct(page, limit int) ([]model.LoanProduct, error) {
+	args := l.Called(page, limit)
 	return args.Get(0).([]model.LoanProduct), args.Error(1)
 }
 

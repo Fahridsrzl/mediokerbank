@@ -29,6 +29,9 @@ func (u *topupUseCase) CreateTopup(topupDto dto.TopupDto) (model.TopupTransactio
 	if user.Status != "verified" {
 		return model.TopupTransaction{}, errors.New("user unverified")
 	}
+	if topupDto.Amount < 10000 {
+		return model.TopupTransaction{}, errors.New("if you don't have money, work harder, min amount 10000")
+	}
 	topup := model.TopupTransaction{
 		UserID: topupDto.UserID,
 		Amount: topupDto.Amount,

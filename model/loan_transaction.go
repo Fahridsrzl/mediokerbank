@@ -7,10 +7,6 @@ type LoanTransaction struct {
 	TrxDate                 time.Time               `json:"trxDate"`
 	User                    User                    `json:"user"`
 	Status                  string                  `json:"status"`
-	Purpose                 string                  `json:"purpose"`
-	ProductId               string                  `json:"productId"`
-	InstallmentPeriod       int                     `json:"installmentPeriod"`
-	Amount                  int                     `json:"amount"`
 	LoanTransactionDetaills []LoanTransactionDetail `json:"loanTransactionDetails"`
 	CreatedAt               time.Time               `json:"createdAt"`
 	UpdatedAt               time.Time               `json:"updatedAt"`

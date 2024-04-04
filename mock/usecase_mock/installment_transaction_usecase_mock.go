@@ -21,8 +21,8 @@ func (i *InstallmentTransactionUseCaseMock) FindTrxById(id string) (model.Instal
 	return args.Get(0).(model.InstallmentTransaction), args.Error(1)
 }
 
-func (i *InstallmentTransactionUseCaseMock) FindTrxMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error) {
-	args := i.Called(payload)
+func (i *InstallmentTransactionUseCaseMock) FindTrxMany(payload dto.InstallmentTransactionSearchDto, page, limit int) ([]model.InstallmentTransaction, error) {
+	args := i.Called(payload, page, limit)
 	return args.Get(0).([]model.InstallmentTransaction), args.Error(1)
 }
 

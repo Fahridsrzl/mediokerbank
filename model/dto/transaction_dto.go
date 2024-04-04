@@ -1,6 +1,9 @@
 package dto
 
-import "medioker-bank/model"
+import (
+	"medioker-bank/model"
+	"time"
+)
 
 type InstallmentTransactionResponseDto struct {
 	Message     string
@@ -28,4 +31,14 @@ type InstallmentTransactionRequestDto struct {
 	UserId        string `json:"userId" binding:"required"`
 	LoanId        string `json:"loanId" binding:"required"`
 	PaymentMethod string `json:"paymentMethod" binding:"required"`
+}
+
+type LoanTransactionResponseDto struct {
+	Id                      string                        `json:"id"`
+	TrxDate                 time.Time                     `json:"trxDate"`
+	UserId                  string                        `json:"userId"`
+	Status                  string                        `json:"status"`
+	LoanTransactionDetaills []model.LoanTransactionDetail `json:"loanTransactionDetails"`
+	CreatedAt               time.Time                     `json:"createdAt"`
+	UpdatedAt               time.Time                     `json:"updatedAt"`
 }

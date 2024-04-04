@@ -36,15 +36,7 @@ type LoanTransactionController struct {
 // @Router /transactions/loans/users/{userId}/{trxId} [get]
 func (l *LoanTransactionController) GetLoanTransacttionByUserIdAndTrxId(ctx *gin.Context) {
 	userId := ctx.Param("userId")
-	if userId == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "user_id can't be empty")
-		return
-	}
 	trxId := ctx.Param("trxId")
-	if userId == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "user_id can't be empty")
-		return
-	}
 	rspPayload, err := l.ul.FIndLoanTransactionByUserIdAndTrxId(userId, trxId)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
@@ -106,8 +98,13 @@ func (l *LoanTransactionController) GetAllHandler(ctx *gin.Context) {
 // @Router /transactions/loans [post]
 func (l *LoanTransactionController) CreateHandler(ctx *gin.Context) {
 	var payload dto.LoanTransactionRequestDto
-	if err := ctx.ShouldBind(&payload); err != nil {
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	userId := ctx.MustGet("id")
+	if userId != payload.UserId {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, errors.New("forbidden action, You should make transactions on your own account").Error())
 		return
 	}
 	rspPayload, err := l.ul.RegisterNewTransaction(payload)
@@ -134,10 +131,6 @@ func (l *LoanTransactionController) CreateHandler(ctx *gin.Context) {
 // @Router /transactions/loans/users/{userId} [get]
 func (l *LoanTransactionController) GetHandlerByUserId(ctx *gin.Context) {
 	userId := ctx.Param("userId")
-	if userId == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "user_id can't be empty")
-		return
-	}
 	rspPayload, err := l.ul.FindByUserId(userId)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
@@ -163,10 +156,6 @@ func (l *LoanTransactionController) GetHandlerByUserId(ctx *gin.Context) {
 // @Router /transactions/loans/{id} [get]
 func (l *LoanTransactionController) GetHandlerById(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
 	rspPayload, err := l.ul.FindById(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
@@ -180,7 +169,7 @@ func (l *LoanTransactionController) Router() {
 	br := l.rg.Group(appconfig.LoanTransactionGroup)
 	{
 		br.POST(appconfig.LoanTransactionCreate, l.jwt.RequireToken("user"), l.CreateHandler)
-		br.GET(appconfig.LoanTransactionFindById, l.jwt.RequireToken("admin"), l.GetHandlerById)
+		br.GET(appconfig.LoanTransactionFindById, l.jwt.RequireToken("admin", "user"), l.GetHandlerById)
 		br.GET(appconfig.LoanTransactionFindByUserId, l.jwt.RequireToken("user"), l.GetHandlerByUserId)
 		br.GET(appconfig.LoanTransactionFindAll, l.jwt.RequireToken("admin"), l.GetAllHandler)
 		br.GET(appconfig.LoanTransactionFindByUserIdAndTrxId, l.jwt.RequireToken("user"), l.GetLoanTransacttionByUserIdAndTrxId)

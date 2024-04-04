@@ -38,6 +38,11 @@ func (t *TransferController) CreateHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+	userId := ctx.MustGet("id")
+	if userId != payload.SenderID {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, errors.New("forbidden action, You should make transactions on your own account").Error())
+		return
+	}
 	respPayload, err := t.tc.CreateTransfer(payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -130,7 +135,7 @@ func (u *TransferController) GetAllTransferHandler(ctx *gin.Context) {
 	}
 
 	// Set response headers and send JSON data
-	ctx.JSON(http.StatusOK, transfers)
+	common.SendSingleResponse(ctx, "ok", transfers)
 }
 
 func (t *TransferController) Router() {
@@ -139,7 +144,7 @@ func (t *TransferController) Router() {
 		ur.POST(appconfig.Transfer, t.jwt.RequireToken("user"), t.CreateHandler)
 		ur.GET(appconfig.Transfer, t.jwt.RequireToken("admin"), t.GetAllTransferHandler)
 		ur.GET(appconfig.TransferSenderId, t.jwt.RequireToken("user"), t.GetSenderIdHandler)
-		ur.GET(appconfig.TransferId, t.jwt.RequireToken("user"), t.GetTransferIdHandler)
+		ur.GET(appconfig.TransferId, t.jwt.RequireToken("admin", "user"), t.GetTransferIdHandler)
 	}
 }
 
