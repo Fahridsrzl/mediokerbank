@@ -17,7 +17,7 @@ func (l *LoanRepoMock) Create(payload model.Loan) (model.Loan, error) {
 
 func (l *LoanRepoMock) FindByUserId(userId string) ([]model.Loan, error) {
 	args := l.Called(userId)
-	return []model.Loan{}, args.Error(1)
+	return args.Get(0).([]model.Loan), args.Error(1)
 }
 
 func (l *LoanRepoMock) UpdatePeriod(loanId string) error {
