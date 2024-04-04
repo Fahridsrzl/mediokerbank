@@ -10,7 +10,7 @@ import (
 type LoanTransactionRepository interface {
 	GetAll() ([]model.LoanTransaction, error)
 	GetByID(id string) (model.LoanTransaction, error)
-	GetByUserID(UserId string) (model.LoanTransaction, error)
+	GetByUserID(userId string) (model.LoanTransaction, error)
 	GetByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error)
 	Create(payload model.LoanTransaction) (model.LoanTransaction, error)
 }
