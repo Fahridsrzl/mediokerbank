@@ -1,2 +1,7 @@
-.env
+logger.log
 go.sum
+note.txt
+repo.txt
+usecase.txt
+controlle.txt
+.vscode

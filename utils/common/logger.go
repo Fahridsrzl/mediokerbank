@@ -5,6 +5,7 @@ import (
 
 	"medioker-bank/config"
 	modelutil "medioker-bank/utils/model_util"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,7 +33,7 @@ func (m *myLogger) InitializeLogger() error {
 }
 
 func (m *myLogger) LogFatal(requestLog modelutil.RequestLog) {
-	m.log.Fatal(requestLog)
+	m.log.Log(logrus.FatalLevel, requestLog)
 }
 
 func (m *myLogger) LogInfo(requestLog modelutil.RequestLog) {

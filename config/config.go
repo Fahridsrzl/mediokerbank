@@ -27,9 +27,21 @@ type LogFileConfig struct {
 }
 
 type TokenConfig struct {
-	IssuerName      string
-	JwtSignatureKey []byte
-	JwtLifeTime     time.Duration
+	IssuerName           string
+	JwtSignatureKey      []byte
+	AccessTokenLifeTime  time.Duration
+	RefreshTokenLifeTime time.Duration
+}
+
+type MailerConfig struct {
+	MailerHost     string
+	MailerPort     int
+	MailerUsername string
+	MailerPassword string
+}
+
+type MidtransConfig struct {
+	MidtransServerKey string
 }
 
 type Config struct {
@@ -37,6 +49,8 @@ type Config struct {
 	DbConfig
 	LogFileConfig
 	TokenConfig
+	MailerConfig
+	MidtransConfig
 }
 
 func (c *Config) readConfig() error {
@@ -49,31 +63,54 @@ func (c *Config) readConfig() error {
 	}
 
 	c.DbConfig = DbConfig{
-		Host:   os.Getenv("DB_HOST"),
-		Port:   os.Getenv("DB_PORT"),
-		Name:   os.Getenv("DB_NAME"),
-		User:   os.Getenv("DB_USER"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Name:     os.Getenv("DB_NAME"),
+		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
-		Driver: os.Getenv("DB_DRIVER"),
+		Driver:   os.Getenv("DB_DRIVER"),
 	}
 
 	c.LogFileConfig = LogFileConfig{
 		FilePath: os.Getenv("LOG_FILE"),
 	}
 
-	tokenLifeTime, err := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
+	accessTokenLifeTime, err := strconv.Atoi(os.Getenv("ACCESS_TOKEN_LIFE_TIME"))
+	if err != nil {
+		return err
+	}
+
+	refreshTokenLifeTime, err := strconv.Atoi(os.Getenv("REFRESH_TOKEN_LIFE_TIME"))
 	if err != nil {
 		return err
 	}
 
 	c.TokenConfig = TokenConfig{
-		IssuerName:      os.Getenv("TOKEN_ISSUE_NAME"),
-		JwtSignatureKey: []byte(os.Getenv("TOKEN_KEY")),
-		JwtLifeTime:     time.Duration(tokenLifeTime) * time.Hour,
+		IssuerName:           os.Getenv("TOKEN_ISSUE_NAME"),
+		JwtSignatureKey:      []byte(os.Getenv("TOKEN_KEY")),
+		AccessTokenLifeTime:  time.Duration(accessTokenLifeTime) * time.Hour,
+		RefreshTokenLifeTime: time.Duration(refreshTokenLifeTime) * time.Hour,
+	}
+
+	mailerPort, err := strconv.Atoi(os.Getenv("MAILER_PORT"))
+	if err != nil {
+		return err
+	}
+
+	c.MailerConfig = MailerConfig{
+		MailerHost:     os.Getenv("MAILER_HOST"),
+		MailerPort:     mailerPort,
+		MailerUsername: os.Getenv("MAILER_USERNAME"),
+		MailerPassword: os.Getenv("MAILER_PASSWORD"),
+	}
+
+	c.MidtransConfig = MidtransConfig{
+		MidtransServerKey: os.Getenv("MIDTRANS_SERVER_KEY"),
 	}
 
 	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.FilePath == "" || c.IssuerName == "" ||
-		c.JwtSignatureKey == nil || c.JwtLifeTime == 0 {
+		c.JwtSignatureKey == nil || c.AccessTokenLifeTime == 0 || c.RefreshTokenLifeTime == 0 ||
+		c.MailerHost == "" || c.MailerPort == 0 || c.MailerUsername == "" || c.MailerPassword == "" || c.MidtransServerKey == "" {
 		return errors.New("environment required")
 	}
 
