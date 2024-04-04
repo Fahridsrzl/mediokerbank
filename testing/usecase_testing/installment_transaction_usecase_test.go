@@ -130,7 +130,7 @@ func (suite *InstallmentTransactionUseCaseTestSuite) TestFindTrxByUserId_Success
 		}},
 	}
 
-	suite.irm.Mock.On("FindByUserId", mock.Anything).Return(trxsMock, nil)
+	suite.irm.Mock.On("FindByUserId", mock.Anything, mock.Anything).Return(trxsMock, nil)
 	suite.lrm.Mock.On("FindByUserId", mock.Anything).Return(loansMock, nil)
 	suite.pum.Mock.On("FindLoanProductById", mock.Anything).Return(model.LoanProduct{}, nil)
 
@@ -146,15 +146,13 @@ func (suite *InstallmentTransactionUseCaseTestSuite) TestFindTrxByUserIdAndTrxId
 		Id:     "1",
 		UserId: "1",
 	}
-	trxsMock := []model.InstallmentTransaction{}
-	trxsMock = append(trxsMock, trxMock)
 	loansMock := []model.Loan{
 		{LoanProduct: model.LoanProduct{
 			Id: "1",
 		}},
 	}
 
-	suite.irm.Mock.On("FindByUserIdAndTrxId", userIdMock, trxIdMock).Return(trxsMock, nil)
+	suite.irm.Mock.On("FindByUserIdAndTrxId", userIdMock, trxIdMock).Return(trxMock, nil)
 	suite.lrm.Mock.On("FindByUserId", mock.Anything).Return(loansMock, nil)
 	suite.pum.Mock.On("FindLoanProductById", mock.Anything).Return(model.LoanProduct{}, nil)
 
@@ -167,8 +165,8 @@ func (suite *InstallmentTransactionUseCaseTestSuite) TestUpdateTrxById_Success()
 	trxIdMock := "1"
 	loanIdMock := "1"
 
-	suite.irm.Mock.On("UpdateById", mock.Anything).Return(trxIdMock, nil)
-	suite.lrm.Mock.On("UpdatePeriod", mock.Anything).Return(loanIdMock, nil)
+	suite.irm.Mock.On("UpdateById", mock.Anything).Return(loanIdMock, nil)
+	suite.lrm.Mock.On("UpdatePeriod", mock.Anything).Return(nil)
 	suite.pum.Mock.On("FindLoanProductById", mock.Anything).Return(model.LoanProduct{}, nil)
 
 	err := suite.iu.UpdateTrxById(trxIdMock)
