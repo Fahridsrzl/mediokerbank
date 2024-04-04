@@ -13,7 +13,7 @@ type TopupRepository interface {
 	CreateTopup(payload model.TopupTransaction) (model.TopupTransaction, error)
 	GetTopUpByTopupId(id string) (model.TopupTransaction, error)
 	GetTopupByUserId(userId string) ([]dto.ResponseTopUp, error)
-	GetAllTopUp() ([]dto.ResponseTopUp, error)
+	GetAllTopUp(page, limit int) ([]dto.ResponseTopUp, error)
 }
 
 type topupRepository struct {
@@ -110,10 +110,11 @@ func (u *topupRepository) GetTopupByUserId(userId string) ([]dto.ResponseTopUp, 
 	return topups, nil
 }
 
-func (u *topupRepository) GetAllTopUp() ([]dto.ResponseTopUp, error) {
+func (u *topupRepository) GetAllTopUp(page, limit int) ([]dto.ResponseTopUp, error) {
 	var topups []dto.ResponseTopUp
 
-	rows, err := u.db.Query(rawquery.GetAllTopUp)
+	offset := (page - 1) * limit
+	rows, err := u.db.Query(rawquery.GetAllTopUp, limit, offset)
 	if err != nil {
 		return nil, err
 	}

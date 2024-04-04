@@ -17,7 +17,7 @@ type UserRepository interface {
 	GetUserByStatus(status string) ([]dto.ResponseStatus, error)
 	GetUserByID(id string) (model.User, error)
 	DeleteUser(id string) (model.User, error)
-	GetAllUsers() ([]dto.UserDto, error)
+	GetAllUsers(page, limit int) ([]dto.UserDto, error)
 	UpdateBalance(id string, amount int) (int, error)
 }
 
@@ -256,9 +256,10 @@ func (u *userRepository) DeleteUser(id string) (model.User, error) {
 	return user, nil
 }
 
-func (u *userRepository) GetAllUsers() ([]dto.UserDto, error) {
+func (u *userRepository) GetAllUsers(page, limit int) ([]dto.UserDto, error) {
 	var users []dto.UserDto
-	rows, err := u.db.Query(rawquery.GetAllUser)
+	offset := (page - 1) * limit
+	rows, err := u.db.Query(rawquery.GetAllUser, limit, offset)
 	if err != nil {
 		return nil, err
 	}

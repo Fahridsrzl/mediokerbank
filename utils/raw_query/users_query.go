@@ -66,7 +66,7 @@ WHERE
 	DeleteUser = `DELETE FROM users WHERE id = $1`
 
 	GetAllUser = `SELECT id, username, email, role, status, credit_score, balance, created_at, updated_at
-	FROM users`
+	FROM users LIMIT $1 OFFSET $2`
 
 	UpdateBalance = `UPDATE users SET balance = balance - $1 WHERE id = $2 RETURNING balance`
 )

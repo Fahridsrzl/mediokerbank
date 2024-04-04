@@ -13,7 +13,7 @@ type TransferUseCase interface {
 	CreateTransfer(transferDto dto.TransferDto) (model.TransferTransaction, error)
 	GetTransferByTransferId(id string) (model.TransferTransaction, error)
 	GetTransferBySenderId(senderId string) ([]dto.ResponseTransfer, error)
-	GetAllTransfer() ([]dto.ResponseTransfer, error)
+	GetAllTransfer(page, limit int) ([]dto.ResponseTransfer, error)
 }
 
 type transferUseCase struct {
@@ -22,11 +22,11 @@ type transferUseCase struct {
 }
 
 func (u *transferUseCase) CreateTransfer(transferDto dto.TransferDto) (model.TransferTransaction, error) {
-	sender,_, err := u.userUc.GetUserByID(transferDto.SenderID)
+	sender, _, err := u.userUc.GetUserByID(transferDto.SenderID)
 	if err != nil {
 		return model.TransferTransaction{}, errors.New("find sender: " + err.Error())
 	}
-	receiver,_, err := u.userUc.GetUserByID(transferDto.ReceiverID)
+	receiver, _, err := u.userUc.GetUserByID(transferDto.ReceiverID)
 	if err != nil {
 		return model.TransferTransaction{}, errors.New("find receiver: " + err.Error())
 	}
@@ -66,8 +66,8 @@ func (u *transferUseCase) GetTransferBySenderId(senderId string) ([]dto.Response
 	return transfers, nil
 }
 
-func (u *transferUseCase) GetAllTransfer() ([]dto.ResponseTransfer, error) {
-	transfers, err := u.repo.GetAllTransfer()
+func (u *transferUseCase) GetAllTransfer(page, limit int) ([]dto.ResponseTransfer, error) {
+	transfers, err := u.repo.GetAllTransfer(page, limit)
 	if err != nil {
 		return nil, fmt.Errorf("there is no transfer")
 	}

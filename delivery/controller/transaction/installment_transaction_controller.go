@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"errors"
 	appconfig "medioker-bank/config/app_config"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/model/dto"
 	usecase "medioker-bank/usecase/transaction"
 	"medioker-bank/utils/common"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -82,10 +84,26 @@ func (i *InstallmentTransactionController) FindTrxByIdHandler(ctx *gin.Context) 
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /transactions/installments/{id} [get]
 func (i *InstallmentTransactionController) FindTrxManyHandler(ctx *gin.Context) {
+	param1 := ctx.Query("page")
+	param2 := ctx.Query("limit")
+	if param1 == "" || param2 == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, errors.New("need query params 'page' & 'limit'").Error())
+		return
+	}
+	page, err := strconv.Atoi(param1)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	limit, err := strconv.Atoi(param2)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
 	payload := dto.InstallmentTransactionSearchDto{
 		TrxDate: ctx.Query("trxDate"),
 	}
-	response, err := i.uc.FindTrxMany(payload)
+	response, err := i.uc.FindTrxMany(payload, page, limit)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return

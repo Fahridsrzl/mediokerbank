@@ -7,7 +7,7 @@ import (
 
 type LoanProductUseCase interface {
 	FindLoanProductById(id string) (model.LoanProduct, error)
-	FindAllLoanProduct() ([]model.LoanProduct, error)
+	FindAllLoanProduct(page, limit int) ([]model.LoanProduct, error)
 	CreateLoanProduct(payload model.LoanProduct) (model.LoanProduct, error)
 	UpdateLoanProduct(id string, payload model.LoanProduct) error
 	DeleteLoanProduct(id string) (model.LoanProduct, error)
@@ -25,10 +25,10 @@ func (l *loanProductUseCase) FindLoanProductById(id string) (model.LoanProduct, 
 	return loanProduct, nil
 }
 
-func (l *loanProductUseCase) FindAllLoanProduct() ([]model.LoanProduct, error) {
+func (l *loanProductUseCase) FindAllLoanProduct(page, limit int) ([]model.LoanProduct, error) {
 	var loanProducts []model.LoanProduct
 	var err error
-	loanProducts, err = l.repo.GetAll()
+	loanProducts, err = l.repo.GetAll(page, limit)
 	if err != nil {
 		return []model.LoanProduct{}, err
 	}

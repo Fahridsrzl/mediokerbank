@@ -13,7 +13,7 @@ type TopupUseCase interface {
 	CreateTopup(topupDto dto.TopupDto) (model.TopupTransaction, error)
 	GetTopUpByTopupId(id string) (model.TopupTransaction, error)
 	GetTopupByUserId(userId string) ([]dto.ResponseTopUp, error)
-	GetAllTopUp() ([]dto.ResponseTopUp, error)
+	GetAllTopUp(page, limit int) ([]dto.ResponseTopUp, error)
 }
 
 type topupUseCase struct {
@@ -22,7 +22,7 @@ type topupUseCase struct {
 }
 
 func (u *topupUseCase) CreateTopup(topupDto dto.TopupDto) (model.TopupTransaction, error) {
-	user,_, err := u.userUc.GetUserByID(topupDto.UserID)
+	user, _, err := u.userUc.GetUserByID(topupDto.UserID)
 	if err != nil {
 		return model.TopupTransaction{}, errors.New("find user: " + err.Error())
 	}
@@ -58,8 +58,8 @@ func (u *topupUseCase) GetTopupByUserId(userId string) ([]dto.ResponseTopUp, err
 	return topups, nil
 }
 
-func (u *topupUseCase) GetAllTopUp() ([]dto.ResponseTopUp, error) {
-	topups, err := u.repo.GetAllTopUp()
+func (u *topupUseCase) GetAllTopUp(page, limit int) ([]dto.ResponseTopUp, error) {
+	topups, err := u.repo.GetAllTopUp(page, limit)
 	if err != nil {
 		return nil, fmt.Errorf("there is no topup")
 	}

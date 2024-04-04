@@ -10,7 +10,7 @@ import (
 )
 
 type LoanTransactionUseCase interface {
-	FindAllLoanTransaction() ([]model.LoanTransaction, error)
+	FindAllLoanTransaction(page, limit int) ([]model.LoanTransaction, error)
 	FIndLoanTransactionByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error)
 	FindById(id string) (model.LoanTransaction, error)
 	FindByUserId(userId string) (model.LoanTransaction, error)
@@ -34,10 +34,10 @@ func (l *loanTransactionUseCase) FIndLoanTransactionByUserIdAndTrxId(userId, trx
 	return loanTransaction, nil
 }
 
-func (l *loanTransactionUseCase) FindAllLoanTransaction() ([]model.LoanTransaction, error) {
+func (l *loanTransactionUseCase) FindAllLoanTransaction(page, limit int) ([]model.LoanTransaction, error) {
 	var loanTransaction []model.LoanTransaction
 	var err error
-	loanTransaction, err = l.repo.GetAll()
+	loanTransaction, err = l.repo.GetAll(page, limit)
 	if err != nil {
 		return []model.LoanTransaction{}, err
 	}

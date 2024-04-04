@@ -13,7 +13,7 @@ type TransferRepository interface {
 	CreateTransfer(payload model.TransferTransaction) (model.TransferTransaction, error)
 	GetTransferByTransferId(id string) (model.TransferTransaction, error)
 	GetTransferBySenderId(senderId string) ([]dto.ResponseTransfer, error)
-	GetAllTransfer() ([]dto.ResponseTransfer, error)
+	GetAllTransfer(page, limit int) ([]dto.ResponseTransfer, error)
 }
 
 type transferRepository struct {
@@ -119,10 +119,12 @@ func (u *transferRepository) GetTransferBySenderId(senderId string) ([]dto.Respo
 	return transfers, nil
 }
 
-func (u *transferRepository) GetAllTransfer() ([]dto.ResponseTransfer, error) {
+func (u *transferRepository) GetAllTransfer(page, limit int) ([]dto.ResponseTransfer, error) {
 	var transfers []dto.ResponseTransfer
 
-	rows, err := u.db.Query(rawquery.GetAllTransfer)
+	offset := (page - 1) * limit
+
+	rows, err := u.db.Query(rawquery.GetAllTransfer, limit, offset)
 	if err != nil {
 		return nil, err
 	}
