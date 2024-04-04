@@ -34,7 +34,7 @@ func (suite *AuthControllerTestSuite) SetupTest() {
 	suite.controller = controller.NewAuthController(suite.aum, suite.rg, suite.jutm)
 }
 
-func TestBillControllerTestSuite(t *testing.T) {
+func TestAuthControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(AuthControllerTestSuite))
 }
 

@@ -42,7 +42,7 @@ func (i *InstallmentTransactionController) CreateTrxHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
-	common.SendSingleResponse(ctx, "Success", response)
+	common.SendCreateResponse(ctx, "Success", response)
 }
 
 // findTrxByIdHandler handles finding an installment transaction by ID

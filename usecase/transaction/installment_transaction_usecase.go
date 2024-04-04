@@ -126,24 +126,24 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 	trxRes.TrxDetail.Loan = loan
 	response.Transaction = trxRes
 
-	newLoans, err := i.loan.FindByUserId(payload.UserId)
-	if err != nil {
-		return dto.InstallmentTransactionResponseDto{}, err
-	}
-	var newLoan model.Loan
-	for _, item := range newLoans {
-		if item.Id != payload.LoanId {
-			return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
-		} else {
-			newLoan = item
-		}
-	}
-	if newLoan.PeriodLeft == 0 {
-		err := i.loan.Delete(newLoan.Id)
-		if err != nil {
-			return dto.InstallmentTransactionResponseDto{}, err
-		}
-	}
+	// newLoans, err := i.loan.FindByUserId(payload.UserId)
+	// if err != nil {
+	// 	return dto.InstallmentTransactionResponseDto{}, err
+	// }
+	// var newLoan model.Loan
+	// for _, item := range newLoans {
+	// 	if item.Id != payload.LoanId {
+	// 		return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
+	// 	} else {
+	// 		newLoan = item
+	// 	}
+	// }
+	// if newLoan.PeriodLeft == 0 {
+	// 	err := i.loan.Delete(newLoan.Id)
+	// 	if err != nil {
+	// 		return dto.InstallmentTransactionResponseDto{}, err
+	// 	}
+	// }
 
 	return response, nil
 }
