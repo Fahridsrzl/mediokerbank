@@ -139,7 +139,7 @@ func (e *UserController) GetStatusHandler(ctx *gin.Context) {
 		return
 	}
 
-	common.SendCreateResponse(ctx, "ok", response)
+	common.SendSingleResponse(ctx, "ok", response)
 }
 
 // updateHandler handles updating user status
