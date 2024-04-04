@@ -13,7 +13,7 @@ import (
 type InstallmentTransactionUseCase interface {
 	CreateTrx(payload dto.InstallmentTransactionRequestDto) (dto.InstallmentTransactionResponseDto, error)
 	FindTrxById(id string) (model.InstallmentTransaction, error)
-	FindTrxMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error)
+	FindTrxMany(payload dto.InstallmentTransactionSearchDto, page, limit int) ([]model.InstallmentTransaction, error)
 	FindTrxByUserId(userId string, payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error)
 	FindTrxByUserIdAndTrxId(userId, trxId string) (model.InstallmentTransaction, error)
 	UpdateTrxById(id string) error
@@ -126,24 +126,24 @@ func (i *installmentTransactionUseCase) CreateTrx(payload dto.InstallmentTransac
 	trxRes.TrxDetail.Loan = loan
 	response.Transaction = trxRes
 
-	// newLoans, err := i.loan.FindByUserId(payload.UserId)
-	// if err != nil {
-	// 	return dto.InstallmentTransactionResponseDto{}, err
-	// }
-	// var newLoan model.Loan
-	// for _, item := range newLoans {
-	// 	if item.Id != payload.LoanId {
-	// 		return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
-	// 	} else {
-	// 		newLoan = item
-	// 	}
-	// }
-	// if newLoan.PeriodLeft == 0 {
-	// 	err := i.loan.Delete(newLoan.Id)
-	// 	if err != nil {
-	// 		return dto.InstallmentTransactionResponseDto{}, err
-	// 	}
-	// }
+	newLoans, err := i.loan.FindByUserId(payload.UserId)
+	if err != nil {
+		return dto.InstallmentTransactionResponseDto{}, err
+	}
+	var newLoan model.Loan
+	for _, item := range newLoans {
+		if item.Id != payload.LoanId {
+			return dto.InstallmentTransactionResponseDto{}, errors.New("loanId not found")
+		} else {
+			newLoan = item
+		}
+	}
+	if newLoan.PeriodLeft == 0 {
+		err := i.loan.Delete(newLoan.Id)
+		if err != nil {
+			return dto.InstallmentTransactionResponseDto{}, err
+		}
+	}
 
 	return response, nil
 }
@@ -172,16 +172,16 @@ func (i *installmentTransactionUseCase) FindTrxById(id string) (model.Installmen
 	return trx, err
 }
 
-func (i *installmentTransactionUseCase) FindTrxMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error) {
+func (i *installmentTransactionUseCase) FindTrxMany(payload dto.InstallmentTransactionSearchDto, page, limit int) ([]model.InstallmentTransaction, error) {
 	var trxs []model.InstallmentTransaction
 	var err error
 	if payload.TrxDate == "" {
-		trxs, err = i.repo.FindAll()
+		trxs, err = i.repo.FindAll(page, limit)
 		if err != nil {
 			return []model.InstallmentTransaction{}, err
 		}
 	} else {
-		trxs, err = i.repo.FindMany(payload)
+		trxs, err = i.repo.FindMany(payload, page, limit)
 		if err != nil {
 			return []model.InstallmentTransaction{}, err
 		}

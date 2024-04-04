@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	appconfig "medioker-bank/config/app_config"
@@ -251,7 +252,23 @@ func (e *UserController) Deletehandler(ctx *gin.Context) {
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /users [get]
 func (u *UserController) GetAllUserHandler(ctx *gin.Context) {
-	users, err := u.uc.GetAllUser()
+	param1 := ctx.Query("page")
+	param2 := ctx.Query("limit")
+	if param1 == "" || param2 == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, errors.New("need query params 'page' & 'limit'").Error())
+		return
+	}
+	page, err := strconv.Atoi(param1)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	limit, err := strconv.Atoi(param2)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	users, err := u.uc.GetAllUser(page, limit)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return

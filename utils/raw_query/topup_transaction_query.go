@@ -11,6 +11,6 @@ const (
 	FROM topup_transactions
 	WHERE user_id = $1`
 	GetAllTopUp = `SELECT id, trx_date, user_id, amount, status, created_at, updated_at
-	FROM topup_transactions`
+	FROM topup_transactions LIMIT $1 OFFSET $2`
 	UpdateBalanceTopup = `UPDATE users SET balance = balance + $1 WHERE id = $2`
 )

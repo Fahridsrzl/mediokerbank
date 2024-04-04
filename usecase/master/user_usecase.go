@@ -11,14 +11,14 @@ type UserUseCase interface {
 	CreateProfileAndAddressThenUpdateUser(profileDto dto.ProfileCreateDto, addressDto dto.AddressCreateDto) (model.Profile, model.Address, error)
 	FindByStatus(status string) ([]dto.ResponseStatus, error)
 	UpdateStatus(id string) error
-	GetUserByID(id string) (model.User, []model.Loan, error) 
+	GetUserByID(id string) (model.User, []model.Loan, error)
 	RemoveUser(id string) (model.User, error)
-	GetAllUser() ([]dto.UserDto, error)
+	GetAllUser(page, limit int) ([]dto.UserDto, error)
 	UpdateUserBalance(id string, amount int) (int, error)
 }
 
 type userUseCase struct {
-	repo repository.UserRepository
+	repo     repository.UserRepository
 	loanrepo repository.LoanRepository
 }
 
@@ -98,7 +98,7 @@ func (u *userUseCase) UpdateStatus(id string) error {
 func (u *userUseCase) GetUserByID(id string) (model.User, []model.Loan, error) {
 	user, err := u.repo.GetUserByID(id)
 	if err != nil {
-		return model.User{},nil, err
+		return model.User{}, nil, err
 	}
 
 	loans, err := u.loanrepo.FindByUserId(id)
@@ -106,7 +106,7 @@ func (u *userUseCase) GetUserByID(id string) (model.User, []model.Loan, error) {
 		return model.User{}, nil, err
 	}
 
-	return user,loans, nil
+	return user, loans, nil
 }
 
 func (u *userUseCase) RemoveUser(id string) (model.User, error) {
@@ -117,8 +117,8 @@ func (u *userUseCase) RemoveUser(id string) (model.User, error) {
 	return user, nil
 }
 
-func (u *userUseCase) GetAllUser() ([]dto.UserDto, error) {
-	users, err := u.repo.GetAllUsers()
+func (u *userUseCase) GetAllUser(page, limit int) ([]dto.UserDto, error) {
+	users, err := u.repo.GetAllUsers(page, limit)
 	if err != nil {
 		return nil, fmt.Errorf("there is no user")
 	}
@@ -133,6 +133,6 @@ func (u *userUseCase) UpdateUserBalance(id string, amount int) (int, error) {
 	return newBalance, nil
 }
 
-func NewUserUseCase(repo repository.UserRepository ,loanrepo repository.LoanRepository) UserUseCase {
+func NewUserUseCase(repo repository.UserRepository, loanrepo repository.LoanRepository) UserUseCase {
 	return &userUseCase{repo: repo, loanrepo: loanrepo}
 }

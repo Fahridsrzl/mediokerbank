@@ -8,7 +8,7 @@ import (
 )
 
 type LoanTransactionRepository interface {
-	GetAll() ([]model.LoanTransaction, error)
+	GetAll(page, limit int) ([]model.LoanTransaction, error)
 	GetByID(id string) (model.LoanTransaction, error)
 	GetByUserID(UserId string) (model.LoanTransaction, error)
 	GetByUserIdAndTrxId(userId, trxId string) ([]model.LoanTransaction, error)
@@ -77,11 +77,12 @@ func (l *loanTransaction) GetByUserIdAndTrxId(userId, trxId string) ([]model.Loa
 	return loanTransactions, nil
 }
 
-func (l *loanTransaction) GetAll() ([]model.LoanTransaction, error) {
+func (l *loanTransaction) GetAll(page, limit int) ([]model.LoanTransaction, error) {
 	var loanTransactions []model.LoanTransaction
 
+	offset := (page - 1) * limit
 	query := rawquery.GetAllLoanTransaction
-	rows, err := l.db.Query(query)
+	rows, err := l.db.Query(query, limit, offset)
 	if err != nil {
 		return nil, err
 	}

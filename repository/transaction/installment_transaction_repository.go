@@ -11,8 +11,8 @@ import (
 type InstallmentTransactionRepository interface {
 	Create(payload model.InstallmentTransaction) (model.InstallmentTransaction, error)
 	FindById(id string) (model.InstallmentTransaction, error)
-	FindAll() ([]model.InstallmentTransaction, error)
-	FindMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error)
+	FindAll(page, limit int) ([]model.InstallmentTransaction, error)
+	FindMany(payload dto.InstallmentTransactionSearchDto, page, limit int) ([]model.InstallmentTransaction, error)
 	FindByUserId(userId string, payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error)
 	FindByUserIdAndTrxId(userId, trxId string) (model.InstallmentTransaction, error)
 	UpdateById(id string) (string, error)
@@ -77,11 +77,12 @@ func (i *installmentTransactionRepository) FindById(id string) (model.Installmen
 	return trx, nil
 }
 
-func (i *installmentTransactionRepository) FindAll() ([]model.InstallmentTransaction, error) {
+func (i *installmentTransactionRepository) FindAll(page, limit int) ([]model.InstallmentTransaction, error) {
 	var trxs []model.InstallmentTransaction
 	var rows *sql.Rows
 	var err error
-	rows, err = i.db.Query(rawquery.FindInstallmentsAll)
+	offset := (page - 1) * limit
+	rows, err = i.db.Query(rawquery.FindInstallmentsAll, limit, offset)
 	if err != nil {
 		return []model.InstallmentTransaction{}, err
 	}
@@ -113,11 +114,12 @@ func (i *installmentTransactionRepository) FindAll() ([]model.InstallmentTransac
 	return trxs, nil
 }
 
-func (i *installmentTransactionRepository) FindMany(payload dto.InstallmentTransactionSearchDto) ([]model.InstallmentTransaction, error) {
+func (i *installmentTransactionRepository) FindMany(payload dto.InstallmentTransactionSearchDto, page, limit int) ([]model.InstallmentTransaction, error) {
 	var trxs []model.InstallmentTransaction
 	var rows *sql.Rows
 	var err error
-	rows, err = i.db.Query(rawquery.FindInstallmentsBySearch, payload.TrxDate)
+	offset := (page - 1) * limit
+	rows, err = i.db.Query(rawquery.FindInstallmentsBySearch, payload.TrxDate, limit, offset)
 	if err != nil {
 		return []model.InstallmentTransaction{}, err
 	}

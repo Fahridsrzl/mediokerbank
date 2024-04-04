@@ -3,8 +3,8 @@ package rawquery
 const (
 	CreateInstallment                 = `INSERT INTO installment_transactions (user_id, status) VALUES ($1, $2) RETURNING *`
 	FindInstallmentById               = `SELECT * FROM installment_transactions WHERE id = $1`
-	FindInstallmentsAll               = `SELECT * FROM installment_transactions`
-	FindInstallmentsBySearch          = `SELECT * FROM installment_transactions WHERE trx_date = $1`
+	FindInstallmentsAll               = `SELECT * FROM installment_transactions LIMIT $2 OFFSET $3`
+	FindInstallmentsBySearch          = `SELECT * FROM installment_transactions WHERE trx_date = $1 LIMIT $2 OFFSET $3`
 	FindInstallmentsByUserId          = `SELECT * FROM installment_transactions WHERE user_id = $1`
 	FindInstallmentsByUserIdAndSearch = `SELECT * FROM installment_transactions WHERE user_id = $1 AND trx_date =$2`
 	FindInstallmentByUserIdAndTrxId   = `SELECT * FROM installment_transactions WHERE user_id = $1 AND id = $2`

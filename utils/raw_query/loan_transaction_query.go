@@ -111,9 +111,9 @@ const (
 	FROM loan_transactions lt
 	JOIN users u ON u.id = lt.user_id
 	JOIN loan_transaction_details ltd ON ltd.trx_id = lt.id
-	JOIN loan_products lp ON lp.id = ltd.product_id;
+	JOIN loan_products lp ON lp.id = ltd.product_id LIMIT $1 OFFSET $2;
 	`
-	GetLoanTransactionByUserIdAndTrxId =  `
+	GetLoanTransactionByUserIdAndTrxId = `
     SELECT
         lt.id AS transaction_id, 
         lt.trx_date, 
@@ -148,7 +148,4 @@ const (
     JOIN loan_products lp ON lp.id = ltd.product_id
     WHERE u.id = $1 AND lt.id = $2;
 `
-
-
 )
-

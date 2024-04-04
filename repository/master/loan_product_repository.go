@@ -8,7 +8,7 @@ import (
 
 type LoanProductRepository interface {
 	GetById(id string) (model.LoanProduct, error)
-	GetAll() ([]model.LoanProduct, error)
+	GetAll(page, limit int) ([]model.LoanProduct, error)
 	Create(payload model.LoanProduct) (model.LoanProduct, error)
 	Update(id string, payload model.LoanProduct) error
 	Delete(id string) (model.LoanProduct, error)
@@ -42,9 +42,10 @@ func (l *loanProductRepository) GetById(id string) (model.LoanProduct, error) {
 	return loanProduct, nil
 }
 
-func (l *loanProductRepository) GetAll() ([]model.LoanProduct, error) {
+func (l *loanProductRepository) GetAll(page, limit int) ([]model.LoanProduct, error) {
 	var loanProducts []model.LoanProduct
-	rows, err := l.db.Query(rawquery.GetAllLoanProducts)
+	offset := (page - 1) * limit
+	rows, err := l.db.Query(rawquery.GetAllLoanProducts, limit, offset)
 	if err != nil {
 		return []model.LoanProduct{}, err
 	}

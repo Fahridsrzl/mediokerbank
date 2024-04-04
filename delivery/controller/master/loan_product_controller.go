@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"errors"
 	appconfig "medioker-bank/config/app_config"
 	"medioker-bank/delivery/middleware"
 	"medioker-bank/model"
 	usecase "medioker-bank/usecase/master"
 	"medioker-bank/utils/common"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -60,7 +62,23 @@ func (l *LoanProductController) GetHandlerById(ctx *gin.Context) {
 // @Failure 500 {object} Status
 // @Router /loan-products [get]
 func (l *LoanProductController) GetAllHandler(ctx *gin.Context) {
-	response, err := l.ul.FindAllLoanProduct()
+	param1 := ctx.Query("page")
+	param2 := ctx.Query("limit")
+	if param1 == "" || param2 == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, errors.New("need query params 'page' & 'limit'").Error())
+		return
+	}
+	page, err := strconv.Atoi(param1)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	limit, err := strconv.Atoi(param2)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	response, err := l.ul.FindAllLoanProduct(page, limit)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -98,7 +116,7 @@ func (l *LoanProductController) CreateHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Created", createdProduct)
 }
 
-/// @Summary Update a loan product
+// / @Summary Update a loan product
 // @Description Update an existing loan product
 // @ID update-loan-product
 // @Tags Loan Product
@@ -156,7 +174,6 @@ func (l *LoanProductController) DeleteHandler(ctx *gin.Context) {
 	response := "success delete loan_products with id: " + id
 	common.SendSingleResponse(ctx, "Deleted successfully", response)
 }
-
 
 func (l *LoanProductController) Router() {
 

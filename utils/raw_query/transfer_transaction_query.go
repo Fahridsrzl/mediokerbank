@@ -11,7 +11,7 @@ const (
 	FROM transfer_transactions
 	WHERE sender_id = $1`
 	GetAllTransfer = `SELECT id, trx_date, sender_id, receiver_id, amount, status, created_at, updated_at
-	FROM transfer_transactions`
+	FROM transfer_transactions LIMIT $1 OFFSET $2`
 	UpdateSenderBalance   = `UPDATE users SET balance = balance - $1 WHERE id = $2`
 	UpdateReceiverBalance = `UPDATE users SET balance = balance + $1 WHERE id = $2`
 )
