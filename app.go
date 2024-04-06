@@ -11,6 +11,7 @@ import (
 
 // @host 16.78.3.230:8081
 // @BasePath /api/v1
+// @schemes http
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
