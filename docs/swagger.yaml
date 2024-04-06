@@ -1377,6 +1377,8 @@ paths:
       summary: Get users by status
       tags:
       - User
+schemes:
+- http
 securityDefinitions:
   ApiKeyAuth:
     description: Bearer <token>

@@ -2112,7 +2112,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "16.78.3.230:8081",
 	BasePath:         "/api/v1",
-	Schemes:          []string{},
+	Schemes:          []string{"http"},
 	Title:            "Tag Service API",
 	Description:      "A Tag service API in Go using Gin framework",
 	InfoInstanceName: "swagger",
