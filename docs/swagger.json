@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "16.78.3.230:8081",
     "basePath": "/api/v1",
     "paths": {
         "/auth/admins/login": {
@@ -412,7 +412,6 @@
                 "tags": [
                     "Loan Product"
                 ],
-                "summary": "Update a loan product",
                 "operationId": "update-loan-product",
                 "parameters": [
                     {
@@ -2023,12 +2022,13 @@
         },
         "dto.TopupDto": {
             "type": "object",
+            "required": [
+                "amount",
+                "userId"
+            ],
             "properties": {
                 "amount": {
                     "type": "integer"
-                },
-                "status": {
-                    "type": "string"
                 },
                 "userId": {
                     "type": "string"
