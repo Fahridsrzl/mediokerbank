@@ -1,15 +1,15 @@
 package main
 
 import (
-	_ "medioker-bank/docs"
 	"medioker-bank/delivery"
+	_ "medioker-bank/docs"
 )
 
 // @title Tag Service API
 // @version 1.0
 // @description A Tag service API in Go using Gin framework
 
-// @host localhost:8080
+// @host 16.78.3.230:8081
 // @BasePath /api/v1
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

@@ -418,7 +418,6 @@ const docTemplate = `{
                 "tags": [
                     "Loan Product"
                 ],
-                "summary": "Update a loan product",
                 "operationId": "update-loan-product",
                 "parameters": [
                     {
@@ -2029,12 +2028,13 @@ const docTemplate = `{
         },
         "dto.TopupDto": {
             "type": "object",
+            "required": [
+                "amount",
+                "userId"
+            ],
             "properties": {
                 "amount": {
                     "type": "integer"
-                },
-                "status": {
-                    "type": "string"
                 },
                 "userId": {
                     "type": "string"
@@ -2110,7 +2110,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "16.78.3.230:8081",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Tag Service API",

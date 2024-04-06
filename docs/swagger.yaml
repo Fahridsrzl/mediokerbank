@@ -78,10 +78,11 @@ definitions:
     properties:
       amount:
         type: integer
-      status:
-        type: string
       userId:
         type: string
+    required:
+    - amount
+    - userId
     type: object
   dto.TransferDto:
     properties:
@@ -117,7 +118,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-host: localhost:8080
+host: 16.78.3.230:8081
 info:
   contact: {}
   description: A Tag service API in Go using Gin framework
@@ -453,7 +454,6 @@ paths:
             $ref: '#/definitions/controller.Status'
       security:
       - ApiKeyAuth: []
-      summary: Update a loan product
       tags:
       - Loan Product
   /transactions/installments:
